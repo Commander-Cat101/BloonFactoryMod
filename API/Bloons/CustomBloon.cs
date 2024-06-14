@@ -16,6 +16,9 @@ using System.Linq;
 using Il2CppAssets.Scripts.Models;
 using Il2CppAssets.Scripts.Models.Bloons.Behaviors;
 using Il2CppAssets.Scripts.Data.Boss;
+using Il2CppAssets.Scripts.Models.GenericBehaviors;
+using BTD_Mod_Helper.Api.Enums;
+using Il2CppAssets.Scripts.Data.Bloons;
 
 namespace BloonFactoryMod.API.Bloons
 {
@@ -43,8 +46,8 @@ namespace BloonFactoryMod.API.Bloons
 
             var display = new CustomBloonDisplay(BloonSave);
             display.Apply(bloonModel);
-            bloonModel.disallowCosmetics = true;
 
+            bloonModel.disallowCosmetics = true;
             bloonModel.maxHealth = BloonSave.Health;
             bloonModel.leakDamage = BloonSave.Damage;
             bloonModel.speed = BloonSave.Speed;

@@ -9,18 +9,23 @@ using Il2CppAssets.Scripts.Models.Towers;
 using Il2CppAssets.Scripts.Simulation.Bloons;
 using Il2CppAssets.Scripts.Unity;
 using Il2CppAssets.Scripts.Unity.Menu;
+using Il2CppAssets.Scripts.Unity.Powers;
 using Il2CppAssets.Scripts.Unity.UI_New.Popups;
 using Il2CppAssets.Scripts.Unity.UI_New.Settings;
 using Il2CppNinjaKiwi.Common;
 using Il2CppNinjaKiwi.Common.ResourceUtils;
+using Il2CppNinjaKiwi.NKMulti.IO;
 using Il2CppSystem.Collections.Generic;
 using Il2CppTMPro;
+using JetBrains.Annotations;
 using MelonLoader;
 using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using static BloonFactoryMod.API.Serializables.CustomBloonDecal;
 
 namespace BloonFactoryMod.UI.Editor
 {
@@ -36,6 +41,8 @@ namespace BloonFactoryMod.UI.Editor
         public ModHelperPanel Visualizer;
         public ModHelperPanel Settings;
         public ModHelperScrollPanel ChildrenPanel;
+        public ModHelperScrollPanel RoundSpawnPanel;
+        public ModHelperScrollPanel BehaviorsPanel;
 
         public ModHelperInputField healthInput;
         public ModHelperInputField speedInput;
@@ -45,6 +52,8 @@ namespace BloonFactoryMod.UI.Editor
         public static CustomBloonSave SelectedBloon;
 
         public ModHelperImage Bloonimage;
+        public ModHelperImage Decal1;
+        public ModHelperImage Decal2;
 
         public override bool OnMenuOpened(Il2CppSystem.Object data)
         {
@@ -86,9 +95,12 @@ namespace BloonFactoryMod.UI.Editor
         {
             var outline = panel.AddPanel(new Info("VisualizerOutline", -1100, 0, 1200, 1800), VanillaSprites.MainBGPanelBlue);
             Visualizer = outline.AddPanel(new Info("Visualizer", 0, 0, 1100, 1700), VanillaSprites.BlueInsertPanel);
-            Bloonimage = Visualizer.AddImage(new Info("BloonImage", 0, 0, 1000, 1000), VanillaSprites.Red);
+            Bloonimage = Visualizer.AddImage(new Info("BloonImage", 0, 0, 1000, 1000), VanillaSprites.LeadFortified);
             Bloonimage.Image.SetSprite(Bloon);
             Bloonimage.Image.color = SelectedBloon.Color;
+
+            Decal1 = Visualizer.AddImage(new Info("BloonImage", 0, 0, 1000, 1000), GetSprite<BloonFactoryMod>("HalfBloonDecal"));
+            Decal2 = Visualizer.AddImage(new Info("BloonImage", 0, 0, 1000, 1000), GetSprite<BloonFactoryMod>("HalfBloonDecal"));
         }
 
         public void SelectEditorPanel(EditorPanel panel)
@@ -97,39 +109,93 @@ namespace BloonFactoryMod.UI.Editor
 
             Visuals.Button.interactable = true;
             Stats.Button.interactable = true;
+            Behaviors.Button.interactable = true;
+            Spawning.Button.interactable = true;
 
             MenuManager.instance.buttonClickSound.Play("ClickSounds");
 
             switch (panel)
             {
                 case EditorPanel.Visuals:
+
                     Visuals.Button.interactable = false;
 
                     var BaseColorPanel = Settings.AddPanel(new Info("BaseColor", -617, 0, 566, 1400), VanillaSprites.MainBGPanelBlue);
-                    BaseColorPanel.AddText(new Info("Text", 0, 550, 550, 200), "Base Color").GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
-                    var RSlider = BaseColorPanel.AddSlider(new Info("RSlider", 0, 0, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
+                    BaseColorPanel.AddText(new Info("Text", 0, 600, 550, 200), "Base Color").GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+                    BaseColorPanel.AddSlider(new Info("RSlider", 0, 0, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.R = (byte)value;
                         UpdateVisuals();
-                    }));
-                    var GSlider = BaseColorPanel.AddSlider(new Info("GSlider", 0, -200, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
+                    })).SetCurrentValue(SelectedBloon.R);
+                    BaseColorPanel.AddSlider(new Info("GSlider", 0, -200, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.G = (byte)value;
                         UpdateVisuals();
-                    }));
-                    var BSlider = BaseColorPanel.AddSlider(new Info("BSlider", 0, -400, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
+                    })).SetCurrentValue(SelectedBloon.G);
+                    BaseColorPanel.AddSlider(new Info("BSlider", 0, -400, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.B = (byte)value;
                         UpdateVisuals();
-                    }));
-                    RSlider.SetCurrentValue(SelectedBloon.R);
-                    GSlider.SetCurrentValue(SelectedBloon.G);
-                    BSlider.SetCurrentValue(SelectedBloon.B);
+                    })).SetCurrentValue(SelectedBloon.B);
+
+                    var BaseDecal1Panel = Settings.AddPanel(new Info("Decal1Panel", 0, 0, 566, 1400), VanillaSprites.MainBGPanelBlue);
+                    BaseDecal1Panel.AddText(new Info("Text", 0, 600, 550, 200), "Decal 1").GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+
+                    List<string> decalOptions = Enum.GetNames<DecalType>().ToIl2CppList();
+
+                    BaseDecal1Panel.AddDropdown(new Info("DecalDropdown", 0, 450, 400, 100), decalOptions, 400, new Action<int>(choice =>
+                    {
+                        SelectedBloon.Decal1.Type = Enum.GetValues<DecalType>()[choice];
+                        UpdateVisuals();
+                    }), VanillaSprites.BlueInsertPanelRound).Dropdown.SetValue(Enum.GetValues<DecalType>().ToList().IndexOf(SelectedBloon.Decal1.Type));
+
+                    BaseDecal1Panel.AddSlider(new Info("RSlider", 0, 0, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
+                    {
+                        SelectedBloon.Decal1.R = (int)value;
+                        UpdateVisuals();
+                    })).SetCurrentValue(SelectedBloon.Decal1.R);
+                    BaseDecal1Panel.AddSlider(new Info("GSlider", 0, -200, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
+                    {
+                        SelectedBloon.Decal1.G = (int)value;
+                        UpdateVisuals();
+                    })).SetCurrentValue(SelectedBloon.Decal1.G);
+                    BaseDecal1Panel.AddSlider(new Info("BSlider", 0, -400, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
+                    {
+                        SelectedBloon.Decal1.B = (int)value;
+                        UpdateVisuals();
+                    })).SetCurrentValue(SelectedBloon.Decal1.B);
+
+                    var BaseDecal2Panel = Settings.AddPanel(new Info("Decal2Panel", 617, 0, 566, 1400), VanillaSprites.MainBGPanelBlue);
+                    BaseDecal2Panel.AddText(new Info("Text", 0, 600, 550, 200), "Decal 2").GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+
+                    BaseDecal2Panel.AddDropdown(new Info("DecalDropdown", 0, 450, 400, 100), decalOptions, 400, new Action<int>(choice =>
+                    {
+                        SelectedBloon.Decal2.Type = Enum.GetValues<DecalType>()[choice];
+                        UpdateVisuals();
+                    }), VanillaSprites.BlueInsertPanelRound).Dropdown.SetValue(Enum.GetValues<DecalType>().ToList().IndexOf(SelectedBloon.Decal2.Type));
+
+                    BaseDecal2Panel.AddSlider(new Info("RSlider", 0, 0, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
+                    {
+                        SelectedBloon.Decal2.R = (int)value;
+                        UpdateVisuals();
+                    })).SetCurrentValue(SelectedBloon.Decal2.R);
+                    BaseDecal2Panel.AddSlider(new Info("GSlider", 0, -200, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
+                    {
+                        SelectedBloon.Decal2.G = (int)value;
+                        UpdateVisuals();
+                    })).SetCurrentValue(SelectedBloon.Decal2.G);
+                    BaseDecal2Panel.AddSlider(new Info("BSlider", 0, -400, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
+                    {
+                        SelectedBloon.Decal2.B = (int)value;
+                        UpdateVisuals();
+                    })).SetCurrentValue(SelectedBloon.Decal2.B);
                     break;
                 case EditorPanel.Stats:
+                    Stats.Button.interactable = false;
+
                     #region BaseStats
                     var BaseStatsPanel = Settings.AddPanel(new Info("BaseStats", -617, 0, 566, 1400), VanillaSprites.MainBGPanelBlue);
-                    BaseStatsPanel.AddText(new Info("Text", 0, 550, 550, 200), "Base Stats").GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+                    BaseStatsPanel.AddText(new Info("Text", 0, 600, 550, 200), "Base Stats").GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
 
                     BaseStatsPanel.AddText(new Info("HealthStatText", -75, 200, 350, 200), "Health:", 65, TextAlignmentOptions.MidlineLeft);
                     healthInput = BaseStatsPanel.AddInputField(new Info("SetHealth", 150, 200, 200, 100), $"{SelectedBloon.Health}", VanillaSprites.BlueInsertPanelRound, new Action<string>(value => { }), 75, TMP_InputField.CharacterValidation.Integer);
@@ -177,7 +243,7 @@ namespace BloonFactoryMod.UI.Editor
                     #endregion
 
                     var BasePropertiesPanel = Settings.AddPanel(new Info("Properties", 0, 0, 566, 1400), VanillaSprites.MainBGPanelBlue);
-                    BasePropertiesPanel.AddText(new Info("Text", 0, 550, 550, 200), "Properties").GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+                    BasePropertiesPanel.AddText(new Info("Text", 0, 600, 550, 200), "Properties").GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
 
                     BasePropertiesPanel.AddText(new Info("CamoStatText", -50, 350, 400, 200), "Camo", 100, TextAlignmentOptions.MidlineLeft);
                     BasePropertiesPanel.AddCheckbox(new Info("SetCamo", 175, 350, 90, 90), SelectedBloon.IsCamo, VanillaSprites.BlueInsertPanelRound, new Action<bool>(value => { SelectedBloon.IsCamo = value; }));
@@ -213,7 +279,7 @@ namespace BloonFactoryMod.UI.Editor
                     regrowInput.InputField.characterValidation = TMP_InputField.CharacterValidation.Decimal;*/
 
                     var BaseChildrenPanel = Settings.AddPanel(new Info("Children", 617, 0, 566, 1400), VanillaSprites.MainBGPanelBlue);
-                    BaseChildrenPanel.AddText(new Info("Text", 0, 550, 550, 200), "Children").GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+                    BaseChildrenPanel.AddText(new Info("Text", 0, 600, 550, 200), "Children").GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
 
 
                     BaseChildrenPanel.AddButton(new Info("CreateNewBloon", 0, 375, 450, 150), VanillaSprites.GreenBtnLong, new System.Action(() =>
@@ -225,14 +291,78 @@ namespace BloonFactoryMod.UI.Editor
 
                     ChildrenPanel = BaseChildrenPanel.AddScrollPanel(new Info("ChildrenScrollPanel", 0, -200, 500, 900), RectTransform.Axis.Vertical, VanillaSprites.BlueInsertPanelRound, 50, 50);
                     UpdateChildPanel();
-                    Stats.Button.interactable = false;
                     break;
+                case EditorPanel.Behaviors:
+
+                    var BaseBehaviorPanel = Settings.AddPanel(new Info("BaseBehaviorsPanel", -617, 0, 566, 1400), VanillaSprites.MainBGPanelBlue);
+                    BaseBehaviorPanel.AddText(new Info("Text", 0, 600, 550, 200), "Add Behaviors").GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+
+                    var addbehaviorpanel = Settings.AddPanel(new Info("idfk", 305f, 0, 1175, 1400), VanillaSprites.MainBGPanelBlue);
+                    BehaviorsPanel = addbehaviorpanel.AddScrollPanel(new Info("BehaviorScrollPanel", 0, 0, 1075, 1300), RectTransform.Axis.Vertical, VanillaSprites.BlueInsertPanelRound, 50, 50);
+
+                    UpdateBehaviorPanel();
+
+                    Behaviors.Button.interactable = false;
+                    break;
+                case EditorPanel.Spawning:
+                    Spawning.Button.interactable = false;
+                    var BaseAddBloonGroupPanel = Settings.AddPanel(new Info("BaseBloonGroup", -617, 0, 566, 1400), VanillaSprites.MainBGPanelBlue);
+                    BaseAddBloonGroupPanel.AddText(new Info("Text", 0, 600, 550, 200), "Bloon Group").GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+
+                    BaseAddBloonGroupPanel.AddButton(new Info("CreateSingleRoundGroup", 0, 375, 450, 200), VanillaSprites.GreenBtnLong, new System.Action(() =>
+                    {
+                        MenuManager.instance.buttonClickSound.Play("ClickSounds");
+                        SelectedBloon.BloonRounds.Add(new CustomBloonRound());
+                        UpdateRoundPanel();
+                    }))
+                    .AddText(new Info("Text", 0, 0, 350, 150), "Add Single Round Group", 100).GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+
+                    BaseAddBloonGroupPanel.AddButton(new Info("CreateMultiRoundGroup", 0, 125, 450, 200), VanillaSprites.GreenBtnLong, new System.Action(() =>
+                    {
+                        MenuManager.instance.buttonClickSound.Play("ClickSounds");
+                        SelectedBloon.BloonRounds.Add(new CustomBloonRound()
+                        { IsMultiRound = true });
+                        UpdateRoundPanel();
+                    }))
+                   .AddText(new Info("Text", 0, 0, 350, 150), "Add Multi Round Group", 100).GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+
+                    //313.3
+                    var addbloonpanel = Settings.AddPanel(new Info("BaseBloonGroup", 305f, 0, 1175, 1400), VanillaSprites.MainBGPanelBlue);
+                    RoundSpawnPanel = addbloonpanel.AddScrollPanel(new Info("BaseBloonGroup", 0, 0, 1075, 1300), RectTransform.Axis.Vertical, VanillaSprites.BlueInsertPanelRound, 50, 50);
+
+                    UpdateRoundPanel();
+                    break;
+                    
             }
         }
 
         public void UpdateVisuals()
         {
             Bloonimage.Image.color = SelectedBloon.Color;
+            if (SelectedBloon.Decal1.Type != DecalType.None)
+            {
+                Decal1.SetActive(true);
+                var names = GetSpriteNames(SelectedBloon.Decal1.Type);
+                Decal1.Image.SetSprite(GetSprite<BloonFactoryMod>(names.Item1));
+            }
+            else
+            {
+                Decal1.SetActive(false);
+            }
+
+            if (SelectedBloon.Decal2.Type != DecalType.None)
+            {
+                Decal2.SetActive(true);
+                var names = GetSpriteNames(SelectedBloon.Decal2.Type);
+                Decal2.Image.SetSprite(GetSprite<BloonFactoryMod>(names.Item1));
+            }
+            else
+            {
+                Decal2.SetActive(false);
+            }
+
+            Decal1.Image.color = SelectedBloon.Decal1.Color;
+            Decal2.Image.color = SelectedBloon.Decal2.Color;
         }
         public void CreateChildrenPopup()
         {
@@ -272,7 +402,7 @@ namespace BloonFactoryMod.UI.Editor
                 {
                     dropdown = p.GetFirstActivePopup().bodyObj.AddModHelperPanel(new Info("BloonsPanel", 400, 700))
                         .AddDropdown(new Info("Filter",
-                                421.5F * 1.5f, 150F * 1.5f, new Vector2(.5f, 0.2f)), bloons, 600 , null, VanillaSprites.BlueInsertPanelRound, 52
+                                421.5F * 1.5f, 150F * 1.5f, new Vector2(.5f, 0.2f)), bloons, 600 , null, VanillaSprites.BlueInsertPanelRound, 70
                         );
 
                     healthInput.GetComponent<Mask>().enabled = false;
@@ -310,9 +440,87 @@ namespace BloonFactoryMod.UI.Editor
                 ChildrenPanel.AddScrollContent(CreateChildrenPanel(children));
             }
         }
+        public void UpdateRoundPanel()
+        {
+            RoundSpawnPanel.ScrollContent.transform.DestroyAllChildren();
+            foreach (var round in SelectedBloon.BloonRounds)
+            {
+                RoundSpawnPanel.AddScrollContent(CreateRoundPanel(round));
+            }
+        }
+        public void UpdateBehaviorPanel()
+        {
+            /*BehaviorsPanel.ScrollContent.transform.DestroyAllChildren();
+            foreach (var behavior in SelectedBloon.BloonBehaviors)
+            {
+                BehaviorsPanel.AddScrollContent(behavior.CreatePanel(SelectedBloon));
+            }*/
+
+        }
+        public ModHelperPanel CreateRoundPanel(CustomBloonRound round)
+        {
+            var panel = ModHelperPanel.Create(new Info("RoundPanel", 0, 0, 975, 400), VanillaSprites.MainBGPanelBlue);
+
+            panel.AddText(new Info("RoundNumberText", -313, 125, 250, 80), round.IsMultiRound ? "Start Round:" : "Round:", 100, TextAlignmentOptions.MidlineLeft).GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+            var roundInput = panel.AddInputField(new Info("RoundNumberInput", -63, 125, 150, 70), $"{round.StartRound}", VanillaSprites.BlueInsertPanelRound, new Action<string>(roundText =>
+            {
+                round.StartRound = int.Parse(roundText);
+            }), 100, TMP_InputField.CharacterValidation.Digit);
+            roundInput.Text.GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+            roundInput.InputField.characterLimit = 3;
+
+            roundInput.SetActive(false);
+            roundInput.SetActive(true);
+
+            if (round.IsMultiRound)
+            {
+                panel.AddText(new Info("RoundNumberText", -313, 50, 250, 80), "End Round:", 100, TextAlignmentOptions.MidlineLeft).GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+                var roundEndInput = panel.AddInputField(new Info("RoundNumberInput", -63, 50, 150, 70), $"{round.EndRound}", VanillaSprites.BlueInsertPanelRound, new Action<string>(roundText =>
+                {
+                    round.EndRound = int.Parse(roundText);
+                }), 100, TMP_InputField.CharacterValidation.Digit);
+                roundEndInput.Text.GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+                roundEndInput.InputField.characterLimit = 3;
+
+                roundEndInput.SetActive(false);
+                roundEndInput.SetActive(true);
+            }
+            
+            panel.AddText(new Info("AmountText", 137, 125, 200, 70), $"Amount:", 100, TextAlignmentOptions.MidlineLeft).GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+            var amountInput = panel.AddInputField(new Info("RoundAmountInput", 337, 125, 150, 70), $"{round.Amount}", VanillaSprites.BlueInsertPanelRound, new Action<string>(roundText =>
+            {
+                round.Amount = int.Parse(roundText);
+            }), 100, TMP_InputField.CharacterValidation.Digit);
+            amountInput.Text.GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+            amountInput.InputField.characterLimit = 3;
+
+            amountInput.SetActive(false);
+            amountInput.SetActive(true);
+
+            panel.AddText(new Info("RoundSpacingText", -313, -125, 250, 80), "Spacing", 100, TextAlignmentOptions.MidlineLeft).GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+            var spacingInput = panel.AddInputField(new Info("RoundSpacingInput", -63, -125, 150, 70), $"{round.Spacing}", VanillaSprites.BlueInsertPanelRound, new Action<string>(roundText =>
+            {
+                round.Spacing = float.Parse(roundText);
+            }), 100, TMP_InputField.CharacterValidation.Decimal);
+            spacingInput.Text.GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+            spacingInput.InputField.characterLimit = 5;
+
+            spacingInput.SetActive(false);
+            spacingInput.SetActive(true);
+
+
+            panel.AddButton(new Info("Delete", 437, -150, 100, 100), VanillaSprites.AddRemoveBtn, new System.Action(() =>
+            {
+                SelectedBloon.BloonRounds.Remove(round);
+                UpdateRoundPanel();
+            }));
+
+            return panel;
+        }
         public ModHelperPanel CreateChildrenPanel(CustomBloonChild children)
         {
             var panel = ModHelperPanel.Create(new Info("ChildrenPanel", 0, 0, 450, 250), VanillaSprites.MainBGPanelBlue);
+
             panel.AddText(new Info("BloonName", 0, 50, 350, 100), children.BloonName, 100, TextAlignmentOptions.MidlineLeft).GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
             panel.AddText(new Info("BloonAmount", -100, -50, 150, 100), $"{children.Amount}x", 100, TextAlignmentOptions.MidlineLeft).GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
             panel.AddButton(new Info("Delete", 150, -50, 100, 100), VanillaSprites.AddRemoveBtn, new System.Action(() =>

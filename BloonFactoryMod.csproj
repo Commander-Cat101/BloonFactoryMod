@@ -12,9 +12,20 @@
     <ItemGroup>
       <None Remove="API\Assets\BaseBloon.png" />
       <None Remove="API\Assets\BaseBloonInGame.png" />
+      <None Remove="API\Assets\Decals\Face1Decal.png" />
+      <None Remove="API\Assets\Decals\Face1DecalInGame.png" />
+      <None Remove="API\Assets\Decals\HalfHorizontalBloonDecal.png" />
+      <None Remove="API\Assets\Decals\HalfHorizontalBloonDecalInGame.png" />
+      <None Remove="API\Assets\Decals\HalfVerticalBloonDecal.png" />
+      <None Remove="API\Assets\Decals\HalfVerticalBloonDecalInGame.png" />
     </ItemGroup>
     <ItemGroup>
         <Content Include=".github\workflows\build.yml" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="API\Serializables\Behaviors\Actions\" />
+      <Folder Include="API\Serializables\Behaviors\ActualBehaviors\" />
+      <Folder Include="API\Serializables\Behaviors\Triggers\" />
     </ItemGroup>
 
     <Import Project="..\btd6.targets" />

@@ -69,6 +69,16 @@ namespace BloonFactoryMod.API.Serializables
 
         [JsonInclude]
         public List<CustomBloonChild> BloonChildren = new List<CustomBloonChild>();
+
+        [JsonInclude]
+        public List<CustomBloonRound> BloonRounds = new List<CustomBloonRound>();
+
+        [JsonInclude]
+        public CustomBloonDecal Decal1 = new CustomBloonDecal();
+
+        [JsonInclude]
+        public CustomBloonDecal Decal2 = new CustomBloonDecal();
+
         public static CustomBloonSave CreateBloonSave(string name)
         {
             
