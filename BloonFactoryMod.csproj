@@ -18,14 +18,16 @@
       <None Remove="API\Assets\Decals\HalfHorizontalBloonDecalInGame.png" />
       <None Remove="API\Assets\Decals\HalfVerticalBloonDecal.png" />
       <None Remove="API\Assets\Decals\HalfVerticalBloonDecalInGame.png" />
+      <None Remove="API\Assets\EmptyTexture.png" />
     </ItemGroup>
     <ItemGroup>
         <Content Include=".github\workflows\build.yml" />
     </ItemGroup>
     <ItemGroup>
+      <Folder Include="API\Behaviors\Actions\" />
+      <Folder Include="API\Behaviors\ActualBehaviors\" />
       <Folder Include="API\Serializables\Behaviors\Actions\" />
       <Folder Include="API\Serializables\Behaviors\ActualBehaviors\" />
-      <Folder Include="API\Serializables\Behaviors\Triggers\" />
     </ItemGroup>
 
     <Import Project="..\btd6.targets" />

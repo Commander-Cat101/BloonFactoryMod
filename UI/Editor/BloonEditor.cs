@@ -1,5 +1,7 @@
-﻿using BloonFactoryMod.API.Bloons;
+﻿using BloonFactoryMod.API.Behaviors;
+using BloonFactoryMod.API.Bloons;
 using BloonFactoryMod.API.Serializables;
+using BloonFactoryMod.API.Serializables.Behaviors.Triggers;
 using BTD_Mod_Helper.Api;
 using BTD_Mod_Helper.Api.Components;
 using BTD_Mod_Helper.Api.Enums;
@@ -297,6 +299,13 @@ namespace BloonFactoryMod.UI.Editor
                     var BaseBehaviorPanel = Settings.AddPanel(new Info("BaseBehaviorsPanel", -617, 0, 566, 1400), VanillaSprites.MainBGPanelBlue);
                     BaseBehaviorPanel.AddText(new Info("Text", 0, 600, 550, 200), "Add Behaviors").GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
 
+                    BaseBehaviorPanel.AddButton(new Info("AddNewBehavior", 0, 375, 450, 200), VanillaSprites.GreenBtnLong, new System.Action(() =>
+                    {
+                        MenuManager.instance.buttonClickSound.Play("ClickSounds");
+                        SelectedBloon.BloonBehaviors.Add(new TowerSoldTriggerSerializable());
+                        UpdateBehaviorPanel();
+                    }));
+
                     var addbehaviorpanel = Settings.AddPanel(new Info("idfk", 305f, 0, 1175, 1400), VanillaSprites.MainBGPanelBlue);
                     BehaviorsPanel = addbehaviorpanel.AddScrollPanel(new Info("BehaviorScrollPanel", 0, 0, 1075, 1300), RectTransform.Axis.Vertical, VanillaSprites.BlueInsertPanelRound, 50, 50);
 
@@ -450,11 +459,11 @@ namespace BloonFactoryMod.UI.Editor
         }
         public void UpdateBehaviorPanel()
         {
-            /*BehaviorsPanel.ScrollContent.transform.DestroyAllChildren();
+            BehaviorsPanel.ScrollContent.transform.DestroyAllChildren();
             foreach (var behavior in SelectedBloon.BloonBehaviors)
             {
-                BehaviorsPanel.AddScrollContent(behavior.CreatePanel(SelectedBloon));
-            }*/
+                BehaviorsPanel.AddScrollContent(CustomBloonBehavior.BehaviorByType[behavior.GetType()].CreatePanel(behavior));
+            }
 
         }
         public ModHelperPanel CreateRoundPanel(CustomBloonRound round)

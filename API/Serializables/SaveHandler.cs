@@ -25,15 +25,10 @@ namespace BloonFactoryMod.API.Serializables
                 LoadBloonFromFile(file);
             }
         }
-        public static void SaveBloon(CustomBloonSave bloon)
+        public static void SaveBloon(CustomBloonSave bloon, string path = "")
         {
-            var content = JsonSerializer.Serialize(bloon);
-            File.WriteAllText(Path.Combine(FolderDirectory, $"{bloon.Name}.bln"), content);
-        }
-        public static void SaveBloon(CustomBloonSave bloon, string path)
-        {
-            var content = JsonSerializer.Serialize(bloon);
-            File.WriteAllText(Path.Combine(path, $"{bloon.Name}.bln"), content);
+            var content = JsonSerializer.Serialize(bloon, new JsonSerializerOptions() { WriteIndented = true });
+            File.WriteAllText(Path.Combine(path == "" ? FolderDirectory : path, $"{bloon.Name}.bln"), content);
         }
         public static void SaveAllBloons()
         {

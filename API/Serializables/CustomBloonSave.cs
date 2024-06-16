@@ -1,4 +1,5 @@
 ﻿using BloonFactoryMod.API.Bloons;
+using BloonFactoryMod.API.Serializables.Behaviors;
 using Il2Cpp;
 using Il2CppSystem;
 using MelonLoader;
@@ -72,6 +73,9 @@ namespace BloonFactoryMod.API.Serializables
 
         [JsonInclude]
         public List<CustomBloonRound> BloonRounds = new List<CustomBloonRound>();
+
+        [JsonInclude]
+        public List<CustomBloonBehaviorSerializable> BloonBehaviors = new List<CustomBloonBehaviorSerializable>();
 
         [JsonInclude]
         public CustomBloonDecal Decal1 = new CustomBloonDecal();

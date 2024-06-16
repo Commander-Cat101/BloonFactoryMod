@@ -29,6 +29,8 @@ namespace BloonFactoryMod.API.Bloons
         public override string Name => $"BloonFactoryBloon:{BloonSave.GUID}";
         public override string BaseBloon => "Red";
 
+        public override bool Camo => BloonSave.IsCamo;
+
         public CustomBloonSave BloonSave;
         public override SpriteReference IconReference => GetSpriteReference("BaseBloon");
 
@@ -60,6 +62,8 @@ namespace BloonFactoryMod.API.Bloons
             bloonModel.bloonProperties = BloonSave.BloonProperties;
 
             bloonModel.RemoveAllChildren();
+
+            bloonModel.SetCamo(BloonSave.IsCamo);
 
             foreach (var bloonchild in BloonSave.BloonChildren)
             {
