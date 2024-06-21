@@ -9,6 +9,7 @@ using System.Linq;
 using System;
 using BTD_Mod_Helper.Extensions;
 using System.Reflection;
+using BloonFactoryMod.API;
 
 [assembly: MelonInfo(typeof(BloonFactoryMod.BloonFactoryMod), ModHelperData.Name, ModHelperData.Version, ModHelperData.RepoOwner)]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]

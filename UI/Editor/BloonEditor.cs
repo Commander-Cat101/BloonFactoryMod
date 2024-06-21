@@ -1,32 +1,23 @@
 ﻿using BloonFactoryMod.API.Behaviors;
-using BloonFactoryMod.API.Bloons;
 using BloonFactoryMod.API.Serializables;
-using BloonFactoryMod.API.Serializables.Behaviors.Triggers;
 using BTD_Mod_Helper.Api;
 using BTD_Mod_Helper.Api.Components;
 using BTD_Mod_Helper.Api.Enums;
 using BTD_Mod_Helper.Extensions;
 using Il2Cpp;
-using Il2CppAssets.Scripts.Models.Towers;
-using Il2CppAssets.Scripts.Simulation.Bloons;
 using Il2CppAssets.Scripts.Unity;
 using Il2CppAssets.Scripts.Unity.Menu;
-using Il2CppAssets.Scripts.Unity.Powers;
 using Il2CppAssets.Scripts.Unity.UI_New.Popups;
 using Il2CppAssets.Scripts.Unity.UI_New.Settings;
 using Il2CppNinjaKiwi.Common;
 using Il2CppNinjaKiwi.Common.ResourceUtils;
-using Il2CppNinjaKiwi.NKMulti.IO;
 using Il2CppSystem.Collections.Generic;
 using Il2CppTMPro;
-using JetBrains.Annotations;
-using MelonLoader;
-using Newtonsoft.Json;
 using System;
-using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using static BloonFactoryMod.API.Behaviors.CustomBloonBehavior;
 using static BloonFactoryMod.API.Serializables.CustomBloonDecal;
 
 namespace BloonFactoryMod.UI.Editor
@@ -208,7 +199,6 @@ namespace BloonFactoryMod.UI.Editor
                     }));
                     healthInput.Text.GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
                     healthInput.InputField.characterLimit = 9;
-                    healthInput.InputField.characterValidation = TMP_InputField.CharacterValidation.Integer;
 
                     BaseStatsPanel.AddText(new Info("SpeedStatText", -75, 50, 350, 200), "Speed:", 65, TextAlignmentOptions.MidlineLeft);
                     speedInput = BaseStatsPanel.AddInputField(new Info("SetSpeed", 150, 50, 200, 100), $"{SelectedBloon.Speed}", VanillaSprites.BlueInsertPanelRound, new Action<string>(value => { }), 75, TMP_InputField.CharacterValidation.Integer);
@@ -299,12 +289,23 @@ namespace BloonFactoryMod.UI.Editor
                     var BaseBehaviorPanel = Settings.AddPanel(new Info("BaseBehaviorsPanel", -617, 0, 566, 1400), VanillaSprites.MainBGPanelBlue);
                     BaseBehaviorPanel.AddText(new Info("Text", 0, 600, 550, 200), "Add Behaviors").GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
 
-                    BaseBehaviorPanel.AddButton(new Info("AddNewBehavior", 0, 375, 450, 200), VanillaSprites.GreenBtnLong, new System.Action(() =>
+                    BaseBehaviorPanel.AddButton(new Info("AddTrigger", 0, 300, 450, 200), VanillaSprites.GreenBtnLong, new Action(() =>
                     {
                         MenuManager.instance.buttonClickSound.Play("ClickSounds");
-                        SelectedBloon.BloonBehaviors.Add(new TowerSoldTriggerSerializable());
-                        UpdateBehaviorPanel();
-                    }));
+                        BehaviorHelper.ShowAddBehaviorPopup(SelectedBloon, BehaviorType.Trigger, new Action(() => { UpdateBehaviorPanel(); }));
+                    })).AddText(new Info("Text", 0, 0, 400, 150), "Add Trigger");
+
+                    BaseBehaviorPanel.AddButton(new Info("AddAction", 0, 0, 450, 200), VanillaSprites.GreenBtnLong, new Action(() =>
+                    {
+                        MenuManager.instance.buttonClickSound.Play("ClickSounds");
+                        BehaviorHelper.ShowAddBehaviorPopup(SelectedBloon, BehaviorType.Action, new Action(() => { UpdateBehaviorPanel(); }));
+                    })).AddText(new Info("Text", 0, 0, 400, 150), "Add Action");
+
+                    BaseBehaviorPanel.AddButton(new Info("AddBehavior", 0, -300, 450, 200), VanillaSprites.GreenBtnLong, new Action(() =>
+                    {
+                        MenuManager.instance.buttonClickSound.Play("ClickSounds");
+                        BehaviorHelper.ShowAddBehaviorPopup(SelectedBloon, BehaviorType.Behavior, new Action(() => { UpdateBehaviorPanel(); }));
+                    })).AddText(new Info("Text", 0, 0, 400, 150), "Add Behavior");
 
                     var addbehaviorpanel = Settings.AddPanel(new Info("idfk", 305f, 0, 1175, 1400), VanillaSprites.MainBGPanelBlue);
                     BehaviorsPanel = addbehaviorpanel.AddScrollPanel(new Info("BehaviorScrollPanel", 0, 0, 1075, 1300), RectTransform.Axis.Vertical, VanillaSprites.BlueInsertPanelRound, 50, 50);
@@ -462,7 +463,9 @@ namespace BloonFactoryMod.UI.Editor
             BehaviorsPanel.ScrollContent.transform.DestroyAllChildren();
             foreach (var behavior in SelectedBloon.BloonBehaviors)
             {
-                BehaviorsPanel.AddScrollContent(CustomBloonBehavior.BehaviorByType[behavior.GetType()].CreatePanel(behavior));
+                var panel = CustomBloonBehavior.BehaviorByType[behavior.GetType()].CreatePanel(behavior, SelectedBloon);
+                panel.AddButton(new Info("DeleteButton", 475, panel.initialInfo.Height / 2, 100, 100), VanillaSprites.AddRemoveBtn, new Action(() => { SelectedBloon.BloonBehaviors.Remove(behavior); UpdateBehaviorPanel(); }));
+                BehaviorsPanel.AddScrollContent(panel);
             }
 
         }

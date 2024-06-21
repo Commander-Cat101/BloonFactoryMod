@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace BloonFactoryMod.API.Serializables.Behaviors.Triggers
 {
-    internal class TowerSoldTriggerSerializable : CustomBloonBehaviorTriggerSerializable
+    internal class OnDamagedTriggerSerializable : CustomBloonBehaviorTriggerSerializable
     {
-        public override string Name => "Tower Sold Trigger";
+        public override string Name => "On Damaged Trigger";
+
+        public float Cooldown = 2f;
     }
 }

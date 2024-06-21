@@ -1,4 +1,7 @@
-﻿using MelonLoader.Utils;
+﻿using BloonFactoryMod.API.Bloons;
+using MelonLoader.Utils;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -27,8 +30,8 @@ namespace BloonFactoryMod.API.Serializables
         }
         public static void SaveBloon(CustomBloonSave bloon, string path = "")
         {
-            var content = JsonSerializer.Serialize(bloon, new JsonSerializerOptions() { WriteIndented = true });
-            File.WriteAllText(Path.Combine(path == "" ? FolderDirectory : path, $"{bloon.Name}.bln"), content);
+            var content = JsonConvert.SerializeObject(bloon, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto, Formatting = Formatting.Indented });
+            File.WriteAllText(Path.Combine(path == "" ? FolderDirectory : path, $"{bloon.GUID}.bln"), content);
         }
         public static void SaveAllBloons()
         {
@@ -37,15 +40,32 @@ namespace BloonFactoryMod.API.Serializables
                 SaveBloon(bloon);
             }
         }
+
+        public static void DeleteBloon(CustomBloonSave save)
+        {
+            LoadedBloons.Remove(save);
+            if (CustomBloon.ActiveBloons.TryGetValue(save.GUID, out var value))
+            {
+                value.ShouldLoad = false;
+            }
+            File.Delete(Path.Combine(FolderDirectory, $"{save.GUID}.bln"));
+        }
         public static CustomBloonSave LoadBloonFromFile(string fileLocation)
         {
-            var bloon = JsonSerializer.Deserialize<CustomBloonSave>(File.ReadAllText(fileLocation));
+            try
+            {
+                var bloon = JsonConvert.DeserializeObject<CustomBloonSave>(File.ReadAllText(fileLocation), new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto, Formatting = Formatting.Indented });
 
-            if (LoadedBloons.Any(a => a.GUID == bloon.GUID))
+                if (LoadedBloons.Any(a => a.GUID == bloon.GUID))
+                    return null;
+
+                LoadedBloons.Add(bloon);
+                return bloon;
+            }
+            catch(Exception e)
+            {
                 return null;
-
-            LoadedBloons.Add(bloon);
-            return bloon;
+            }
         }
     }
 }

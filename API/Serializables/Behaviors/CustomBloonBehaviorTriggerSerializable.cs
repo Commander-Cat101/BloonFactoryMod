@@ -8,6 +8,6 @@ namespace BloonFactoryMod.API.Serializables.Behaviors
 {
     public abstract class CustomBloonBehaviorTriggerSerializable : CustomBloonBehaviorSerializable 
     {
-        public List<string> ActionIDs;
+        public List<string> ActionIDs = new List<string>();
     }
 }

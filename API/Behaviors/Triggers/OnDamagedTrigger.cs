@@ -10,27 +10,31 @@ using Il2CppAssets.Scripts.Models.Bloons;
 using Il2CppAssets.Scripts.Models.Bloons.Behaviors;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppNinjaKiwi.Common;
+using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace BloonFactoryMod.API.Behaviors.Triggers
 {
-    internal class TowerSoldTrigger : CustomBloonBehavior<TowerSoldTriggerSerializable>
+    internal class OnDamagedTrigger : CustomBloonBehavior<OnDamagedTriggerSerializable>
     {
         public override BehaviorType Type => BehaviorType.Trigger;
-        public override string Name => "Tower Sold Trigger";
+        public override string Name => "On Damaged Trigger";
         public override void AddToBloon(BloonModel bloon, CustomBloonBehaviorSerializable serializable)
         {
-            bloon.AddBehavior<SellTriggerModel>(new SellTriggerModel("SellTrigger:" + serializable.GUID, new Il2CppStringArray(((CustomBloonBehaviorTriggerSerializable)serializable).ActionIDs.ToArray())));
+            OnDamagedTriggerSerializable trigger = (OnDamagedTriggerSerializable)serializable;
+            bloon.AddBehavior(new OnDamagedTriggerModel($"OnDamagedTrigger:{serializable.GUID}", new Il2CppStringArray(trigger.ActionIDs.ToArray()), trigger.Cooldown));
         }
 
         public override ModHelperPanel CreatePanel(CustomBloonBehaviorSerializable serializable, CustomBloonSave save)
         {
+            OnDamagedTriggerSerializable damage = (OnDamagedTriggerSerializable)serializable;
+
             var panel = ModHelperPanel.Create(new Info(Name, 0, 0, 950, 700), VanillaSprites.MainBGPanelBlue);
-            panel.AddText(new Info("Text", -237.5f, 250, 450, 200), Name, 70, Il2CppTMPro.TextAlignmentOptions.Center);
+            panel.AddText(new Info("Text", -237.5f, 250, 450, 180), Name, 70, Il2CppTMPro.TextAlignmentOptions.Center).Text.GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
             var scrollpanel = panel.AddScrollPanel(new Info("Actions", 225, 100, 400, 400), UnityEngine.RectTransform.Axis.Vertical, VanillaSprites.BlueInsertPanelRound);
-            panel.AddButton(new Info("Button", 225f, -250, 400, 150), VanillaSprites.GreenBtnLong, new System.Action(() =>
+            panel.AddButton(new Info("Button", 225f, -225, 400, 200), VanillaSprites.GreenBtnLong, new System.Action(() =>
             {
                 BehaviorHelper.ShowAddActionPopup(save, (CustomBloonBehaviorTriggerSerializable)serializable, new Action<CustomBloonBehaviorSerializable>(behavior =>
                 {
@@ -39,7 +43,19 @@ namespace BloonFactoryMod.API.Behaviors.Triggers
                 }));
             })).AddText(new Info("Text", 0, 0, 400, 150), "Add Action");
 
-            UpdateScrollPanel(scrollpanel, (CustomBloonBehaviorTriggerSerializable)serializable, save);
+            panel.AddText(new Info("CooldownText", -237.5f, 50, 400, 150), "Cooldown:", 60, Il2CppTMPro.TextAlignmentOptions.Center);
+            var input = panel.AddInputField(new Info("CooldownInput", -237.5f, -75, 250, 100), $"{damage.Cooldown}", VanillaSprites.BlueInsertPanelRound, new Action<string>(value =>
+            {
+                if (float.TryParse(value, out float result))
+                {
+                    damage.Cooldown = result;
+                }
+            }), 50, Il2CppTMPro.TMP_InputField.CharacterValidation.Decimal, Il2CppTMPro.TextAlignmentOptions.Center);
+            input.Text.GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+            input.SetActive(false);
+            input.SetActive(true);
+
+            UpdateScrollPanel(scrollpanel, damage, save);
             return panel;
         }
 

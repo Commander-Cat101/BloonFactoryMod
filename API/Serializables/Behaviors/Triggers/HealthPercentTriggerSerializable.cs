@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace BloonFactoryMod.API.Serializables.Behaviors.Triggers
 {
-    internal class TowerSoldTriggerSerializable : CustomBloonBehaviorTriggerSerializable
+    internal class HealthPercentTriggerSerializable : CustomBloonBehaviorTriggerSerializable
     {
-        public override string Name => "Tower Sold Trigger";
+        public override string Name => "Health Percent Trigger";
+
+        public float Percent = 50;
     }
 }

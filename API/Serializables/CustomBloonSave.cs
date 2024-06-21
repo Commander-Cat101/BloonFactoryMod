@@ -6,6 +6,7 @@ using MelonLoader;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using UnityEngine;
+using JsonIgnoreAttribute = Newtonsoft.Json.JsonIgnoreAttribute;
 
 namespace BloonFactoryMod.API.Serializables
 {
@@ -15,7 +16,7 @@ namespace BloonFactoryMod.API.Serializables
         public string Name = "";
 
         [JsonInclude]
-        public float Speed = 5;
+        public float Speed = 50;
 
         [JsonInclude]
         public int Health = 1;
@@ -27,7 +28,7 @@ namespace BloonFactoryMod.API.Serializables
         public Color Color { get { return new Color((float)R / 255, (float)G / 255, (float)B / 255); } set { R = (int)value.r * 255; G = (int)value.g * 255; B = (int)value.b * 255; } }
 
         [JsonInclude]
-        public int R = 0;
+        public int R = 255;
 
         [JsonInclude]
         public int G = 255;
@@ -85,7 +86,6 @@ namespace BloonFactoryMod.API.Serializables
 
         public static CustomBloonSave CreateBloonSave(string name)
         {
-            
             var guid = Guid.NewGuid();
             var bloon = new CustomBloonSave()
             {
@@ -98,6 +98,17 @@ namespace BloonFactoryMod.API.Serializables
         public static CustomBloonSave CreateBloonSave()
         {
             return CreateBloonSave("Default Bloon");
+        }
+        public static CustomBloonSave DuplicateBloonSave(string name, CustomBloonSave save)
+        {
+            CustomBloonSave bloon = (CustomBloonSave)save.MemberwiseClone();
+
+            var guid = Guid.NewGuid();
+            bloon.GUID = guid.ToString();
+            bloon.Name = name;
+
+            MelonLogger.Msg($"Created new BloonsSave with the GUID: {bloon.GUID}");
+            return bloon;
         }
 
         public bool IsActive()

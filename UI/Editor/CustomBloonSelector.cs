@@ -109,9 +109,12 @@ namespace BloonFactoryMod.UI.Editor
                     "Would you like export your bloon?", new Action(() => { ExportBloon(bloon); }),
                     "Yes", null, "No", Popup.TransitionAnim.Scale));
             }));
-
             var exit = export.AddImage(new Info("Exit", 130), VanillaSprites.ExitIcon);
             exit.RectTransform.Rotate(0, 0, -90);
+
+            //panel.AddButton(new Info("Duplicate", 850, 0, 200, 200), VanillaSprites.CopyClipboardBtn, new Action(() => { DuplicateBloon(bloon); }));
+
+            panel.AddButton(new Info("Delete", 850, 0, 200, 200), VanillaSprites.CloseBtn, new Action(() => { DeleteBloon(bloon); }));
 
             return mainpanel;
         }
@@ -149,7 +152,27 @@ namespace BloonFactoryMod.UI.Editor
             SaveHandler.LoadedBloons.Add(CustomBloonSave.CreateBloonSave(name));
             LoadBloons();
         }
-
+        public void DeleteBloon(CustomBloonSave save)
+        {
+            PopupScreen.instance.SafelyQueue(screen => screen.ShowPopup(PopupScreen.Placement.inGameCenter, "Delete Bloon.", "Would you like to delete this bloon?\nThis can not be undone!", new Action(() => { SaveHandler.DeleteBloon(save); LoadBloons(); }), "Continue", null, null, Popup.TransitionAnim.Scale));
+        }
+        public void DuplicateBloon(CustomBloonSave save)
+        {
+            PopupScreen.instance.SafelyQueue(screen => screen.ShowSetNamePopup("Duplicate Bloon", "Name of bloon duplicate.\n", new Action<string>(name =>
+            {
+                if (!string.IsNullOrEmpty(name))
+                {
+                    SaveHandler.LoadedBloons.Add(CustomBloonSave.DuplicateBloonSave(name, save));
+                    LoadBloons();
+                }
+            }), null));
+            PopupScreen.instance.SafelyQueue(screen => screen.ModifyField(tmpInputField =>
+            {
+                tmpInputField.textComponent.font = Fonts.Btd6FontBody;
+                tmpInputField.characterLimit = 20;
+                tmpInputField.characterValidation = TMP_InputField.CharacterValidation.Alphanumeric;
+            }));
+        }
         public void ImportBloon()
         {
             FileDialogHelper.PrepareNativeDlls();
@@ -159,7 +182,7 @@ namespace BloonFactoryMod.UI.Editor
 
                 if (bloon == null)
                 {
-                    PopupScreen.instance.SafelyQueue(screen => screen.ShowPopup(PopupScreen.Placement.inGameCenter, "Import Failed!", "Bloon already exists.", null, "Continue", null, null, Popup.TransitionAnim.Scale));
+                    PopupScreen.instance.SafelyQueue(screen => screen.ShowPopup(PopupScreen.Placement.inGameCenter, "Import Failed!", "Import Failed for what ever reason.", null, "Continue", null, null, Popup.TransitionAnim.Scale));
                     return;
                 }
 

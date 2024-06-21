@@ -1,9 +1,7 @@
-﻿using BloonFactoryMod.API.Bloons;
-using Il2Cpp;
-using Il2CppSystem;
-using MelonLoader;
+﻿using Newtonsoft.Json;
 using System.Text.Json.Serialization;
 using UnityEngine;
+using JsonIgnoreAttribute = Newtonsoft.Json.JsonIgnoreAttribute;
 
 namespace BloonFactoryMod.API.Serializables
 {
@@ -28,7 +26,9 @@ namespace BloonFactoryMod.API.Serializables
             None,
             HalfHorizontalBloon,
             HalfVerticalBloon,
-            Face1
+            Bowtie,
+            Face1,
+            Sword
         }
         public static string GetDecalName(DecalType decal)
         {
@@ -37,7 +37,9 @@ namespace BloonFactoryMod.API.Serializables
                 DecalType.None => "None",
                 DecalType.HalfHorizontalBloon => "Half Horizontal Bloon",
                 DecalType.HalfVerticalBloon => "Half Vertical Bloon",
+                DecalType.Bowtie => "Bowtie",
                 DecalType.Face1 => "Face 1",
+                DecalType.Sword => "Sword",
                 _ => throw new System.NotImplementedException()
             };
         }
@@ -53,7 +55,9 @@ namespace BloonFactoryMod.API.Serializables
                 DecalType.None => (string.Empty, string.Empty),
                 DecalType.HalfHorizontalBloon => ("HalfHorizontalBloonDecal", "HalfHorizontalBloonDecalInGame"),
                 DecalType.HalfVerticalBloon => ("HalfVerticalBloonDecal", "HalfVerticalBloonDecalInGame"),
-                DecalType.Face1 => ("Face1Decal", "Face1DecalInGame")
+                DecalType.Bowtie => ("BowtieDecal", "BowtieDecalInGame"),
+                DecalType.Face1 => ("Face1Decal", "Face1DecalInGame"),
+                DecalType.Sword => ("IronSwordDecal", "IronSwordDecalInGame")
             };
         }
     }

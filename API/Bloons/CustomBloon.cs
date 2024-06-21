@@ -19,6 +19,8 @@ using Il2CppAssets.Scripts.Data.Boss;
 using Il2CppAssets.Scripts.Models.GenericBehaviors;
 using BTD_Mod_Helper.Api.Enums;
 using Il2CppAssets.Scripts.Data.Bloons;
+using BloonFactoryMod.API.Behaviors;
+using Il2CppNinjaKiwi.NKMulti.IO;
 
 namespace BloonFactoryMod.API.Bloons
 {
@@ -26,12 +28,12 @@ namespace BloonFactoryMod.API.Bloons
     {
         public static Dictionary<string, CustomBloon> ActiveBloons = new Dictionary<string, CustomBloon>();
         public override bool UseIconAsDisplay => false;
-        public override string Name => $"BloonFactoryBloon:{BloonSave.GUID}";
+        public override string Name => $"{BloonSave.Name}:{BloonSave.GUID}";
         public override string BaseBloon => "Red";
 
-        public override bool Camo => BloonSave.IsCamo;
-
         public CustomBloonSave BloonSave;
+
+        public bool ShouldLoad = true;
         public override SpriteReference IconReference => GetSpriteReference("BaseBloon");
 
         public CustomBloon()
@@ -44,15 +46,14 @@ namespace BloonFactoryMod.API.Bloons
         }
         public override void ModifyBaseBloonModel(BloonModel bloonModel)
         {
-            bloonModel.id = Name;
-
-            var display = new CustomBloonDisplay(BloonSave);
-            display.Apply(bloonModel);
+            bloonModel.name = bloonModel.id = Name;
 
             bloonModel.disallowCosmetics = true;
             bloonModel.maxHealth = BloonSave.Health;
             bloonModel.leakDamage = BloonSave.Damage;
             bloonModel.speed = BloonSave.Speed;
+
+            bloonModel.SetCamo(BloonSave.IsCamo);
 
             if (!bloonModel.HasBehavior<CreateSoundOnDamageBloonModel>())
             {
@@ -60,24 +61,6 @@ namespace BloonFactoryMod.API.Bloons
                 bloonModel.AddBehavior(createsound);
             }
             bloonModel.bloonProperties = BloonSave.BloonProperties;
-
-            bloonModel.RemoveAllChildren();
-
-            bloonModel.SetCamo(BloonSave.IsCamo);
-
-            foreach (var bloonchild in BloonSave.BloonChildren)
-            {
-                bloonModel.AddToChildren(bloonchild.BloonName, bloonchild.Amount);
-            }
-
-            if (!bloonModel.HasBehavior<DistributeCashModel>())
-            {
-                bloonModel.AddBehavior(new DistributeCashModel("GiveCash", BloonSave.CashDropped));
-            }
-            else
-            {
-                bloonModel.GetBehavior<DistributeCashModel>().cash = BloonSave.CashDropped;
-            }
         }
         public override void Register()
         {
@@ -94,9 +77,32 @@ namespace BloonFactoryMod.API.Bloons
             }
         }
 
-        public void ModifyLoadedBloon(BloonModel bloon)
+        public void ModifyLoadedBloon(BloonModel bloonModel)
         {
-            ModifyBaseBloonModel(bloon);
+            if (!ShouldLoad)
+            {
+                bloonModel.dontShowInSandbox = true;
+                return;
+            }
+
+            ModifyBaseBloonModel(bloonModel);
+
+            var display = new CustomBloonDisplay(BloonSave);
+            display.Apply(bloonModel);
+
+            bloonModel.RemoveAllChildren();
+
+            foreach (var bloonchild in BloonSave.BloonChildren)
+            {
+                bloonModel.AddToChildren(bloonchild.BloonName, bloonchild.Amount);
+            }
+
+            bloonModel.GetBehavior<DistributeCashModel>().cash = BloonSave.CashDropped;
+
+            foreach (var bloonbehavior in BloonSave.BloonBehaviors)
+            {
+                CustomBloonBehavior.BehaviorByType[bloonbehavior.GetType()].AddToBloon(bloonModel, bloonbehavior);
+            }
         }
     }
 }

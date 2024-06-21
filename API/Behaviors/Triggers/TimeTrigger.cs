@@ -10,27 +10,31 @@ using Il2CppAssets.Scripts.Models.Bloons;
 using Il2CppAssets.Scripts.Models.Bloons.Behaviors;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppNinjaKiwi.Common;
+using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace BloonFactoryMod.API.Behaviors.Triggers
 {
-    internal class TowerSoldTrigger : CustomBloonBehavior<TowerSoldTriggerSerializable>
+    internal class TimeTrigger : CustomBloonBehavior<TimeTriggerSerializable>
     {
         public override BehaviorType Type => BehaviorType.Trigger;
-        public override string Name => "Tower Sold Trigger";
+        public override string Name => "Time Trigger";
         public override void AddToBloon(BloonModel bloon, CustomBloonBehaviorSerializable serializable)
         {
-            bloon.AddBehavior<SellTriggerModel>(new SellTriggerModel("SellTrigger:" + serializable.GUID, new Il2CppStringArray(((CustomBloonBehaviorTriggerSerializable)serializable).ActionIDs.ToArray())));
+            TimeTriggerSerializable time = (TimeTriggerSerializable)serializable;
+            bloon.AddBehavior(new TimeTriggerModel("TimeTrigger:" + serializable.GUID, time.Interval, false, new Il2CppStringArray(((CustomBloonBehaviorTriggerSerializable)serializable).ActionIDs.ToArray())));
         }
 
         public override ModHelperPanel CreatePanel(CustomBloonBehaviorSerializable serializable, CustomBloonSave save)
         {
+            TimeTriggerSerializable time = (TimeTriggerSerializable)serializable;
+
             var panel = ModHelperPanel.Create(new Info(Name, 0, 0, 950, 700), VanillaSprites.MainBGPanelBlue);
             panel.AddText(new Info("Text", -237.5f, 250, 450, 200), Name, 70, Il2CppTMPro.TextAlignmentOptions.Center);
             var scrollpanel = panel.AddScrollPanel(new Info("Actions", 225, 100, 400, 400), UnityEngine.RectTransform.Axis.Vertical, VanillaSprites.BlueInsertPanelRound);
-            panel.AddButton(new Info("Button", 225f, -250, 400, 150), VanillaSprites.GreenBtnLong, new System.Action(() =>
+            panel.AddButton(new Info("Button", 225f, -225, 400, 200), VanillaSprites.GreenBtnLong, new System.Action(() =>
             {
                 BehaviorHelper.ShowAddActionPopup(save, (CustomBloonBehaviorTriggerSerializable)serializable, new Action<CustomBloonBehaviorSerializable>(behavior =>
                 {
@@ -38,6 +42,19 @@ namespace BloonFactoryMod.API.Behaviors.Triggers
                     UpdateScrollPanel(scrollpanel, (CustomBloonBehaviorTriggerSerializable)serializable, save);
                 }));
             })).AddText(new Info("Text", 0, 0, 400, 150), "Add Action");
+
+            panel.AddText(new Info("IntervalText", -237.5f, 50, 400, 150), "Interval:", 60, Il2CppTMPro.TextAlignmentOptions.Center);
+            var input = panel.AddInputField(new Info("IntervalInput", -237.5f, -75, 250, 100), $"{time.Interval}", VanillaSprites.BlueInsertPanelRound, new Action<string>(value =>
+            {
+                if (float.TryParse(value, out float result))
+                {
+                    time.Interval = result;
+                }
+            }), 50, Il2CppTMPro.TMP_InputField.CharacterValidation.Decimal, Il2CppTMPro.TextAlignmentOptions.Center);
+            input.Text.GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+            input.SetActive(false);
+            input.SetActive(true);
+
 
             UpdateScrollPanel(scrollpanel, (CustomBloonBehaviorTriggerSerializable)serializable, save);
             return panel;
