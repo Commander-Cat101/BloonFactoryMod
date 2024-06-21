@@ -26,6 +26,8 @@ namespace BloonFactoryMod.UI.Editor
     {
         internal SpriteReference Bloon = ModContent.GetSpriteReference<BloonFactoryMod>("BaseBloon");
 
+        public const float OffsetPerPixel = 8f;
+
         ModHelperButton Visuals;
         ModHelperButton Stats;
         ModHelperButton Behaviors;
@@ -57,7 +59,7 @@ namespace BloonFactoryMod.UI.Editor
 
             CreateLeftPanel(BloonMenu);
             CreateRightPanel(BloonMenu);
-            
+
             UpdateVisuals();
 
             return false;
@@ -370,6 +372,9 @@ namespace BloonFactoryMod.UI.Editor
             {
                 Decal2.SetActive(false);
             }
+
+            Decal1.transform.localPosition = new Vector3(OffsetPerPixel * (SelectedBloon.Decal1.GetOffsetX() - 64), OffsetPerPixel * (SelectedBloon.Decal1.GetOffsetY() - 64), 0);
+            Decal2.transform.localPosition = new Vector3(OffsetPerPixel * (SelectedBloon.Decal2.GetOffsetX() - 64), OffsetPerPixel * (SelectedBloon.Decal2.GetOffsetY() - 64), 0);
 
             Decal1.Image.color = SelectedBloon.Decal1.Color;
             Decal2.Image.color = SelectedBloon.Decal2.Color;

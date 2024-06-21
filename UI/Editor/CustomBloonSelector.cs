@@ -33,11 +33,8 @@ namespace BloonFactoryMod.UI.Editor
         {
             if (BloonEditor.SelectedBloon != null)
             {
-                MelonLogger.Msg("Opening menu");
                 if (BloonEditor.SelectedBloon.IsActive())
                 {
-
-                    MelonLogger.Msg("setting active blooon");
                     CustomBloon.ActiveBloons[BloonEditor.SelectedBloon.GUID].BloonSave = BloonEditor.SelectedBloon;
                 }
             }
@@ -154,7 +151,7 @@ namespace BloonFactoryMod.UI.Editor
         }
         public void DeleteBloon(CustomBloonSave save)
         {
-            PopupScreen.instance.SafelyQueue(screen => screen.ShowPopup(PopupScreen.Placement.inGameCenter, "Delete Bloon.", "Would you like to delete this bloon?\nThis can not be undone!", new Action(() => { SaveHandler.DeleteBloon(save); LoadBloons(); }), "Continue", null, null, Popup.TransitionAnim.Scale));
+            PopupScreen.instance.SafelyQueue(screen => screen.ShowPopup(PopupScreen.Placement.inGameCenter, "Delete Bloon.", "Would you like to delete this bloon?\nThis can not be undone!", new Action(() => { SaveHandler.DeleteBloon(save); LoadBloons(); }), "Continue", null, "Cancel", Popup.TransitionAnim.Scale));
         }
         public void DuplicateBloon(CustomBloonSave save)
         {

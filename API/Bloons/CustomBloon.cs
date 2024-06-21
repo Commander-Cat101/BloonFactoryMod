@@ -51,6 +51,7 @@ namespace BloonFactoryMod.API.Bloons
             bloonModel.disallowCosmetics = true;
             bloonModel.maxHealth = BloonSave.Health;
             bloonModel.leakDamage = BloonSave.Damage;
+            bloonModel.totalLeakDamage = new Il2CppSystem.Nullable<float>(BloonSave.Damage);
             bloonModel.speed = BloonSave.Speed;
 
             bloonModel.SetCamo(BloonSave.IsCamo);

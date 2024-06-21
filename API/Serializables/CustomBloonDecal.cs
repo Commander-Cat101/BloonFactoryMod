@@ -21,6 +21,15 @@ namespace BloonFactoryMod.API.Serializables
 
         [JsonInclude]
         public DecalType Type = DecalType.None;
+
+        public int GetOffsetX()
+        {
+            return GetSpriteOffset(Type).x + 64;
+        }
+        public int GetOffsetY()
+        {
+            return GetSpriteOffset(Type).y + 64;
+        }
         public enum DecalType
         {
             None,
@@ -28,7 +37,10 @@ namespace BloonFactoryMod.API.Serializables
             HalfVerticalBloon,
             Bowtie,
             Face1,
-            Sword
+            Sword,
+            Fedora,
+            Disguise,
+            Camo
         }
         public static string GetDecalName(DecalType decal)
         {
@@ -40,7 +52,10 @@ namespace BloonFactoryMod.API.Serializables
                 DecalType.Bowtie => "Bowtie",
                 DecalType.Face1 => "Face 1",
                 DecalType.Sword => "Sword",
-                _ => throw new System.NotImplementedException()
+                DecalType.Fedora => "Fedora",
+                DecalType.Disguise => "Disguise",
+                DecalType.Camo => "Camo",
+                _ => "Uh..."
             };
         }
         /// <summary>
@@ -57,7 +72,19 @@ namespace BloonFactoryMod.API.Serializables
                 DecalType.HalfVerticalBloon => ("HalfVerticalBloonDecal", "HalfVerticalBloonDecalInGame"),
                 DecalType.Bowtie => ("BowtieDecal", "BowtieDecalInGame"),
                 DecalType.Face1 => ("Face1Decal", "Face1DecalInGame"),
-                DecalType.Sword => ("IronSwordDecal", "IronSwordDecalInGame")
+                DecalType.Sword => ("IronSwordDecal", "IronSwordDecalInGame"),
+                DecalType.Fedora => ("FedoraDecal", "FedoraDecalInGame"),
+                DecalType.Disguise => ("DisguiseDecal", "DisguiseDecalInGame"),
+                DecalType.Camo => ("CamoDecal", "CamoDecalInGame")
+            };
+        }
+
+        public static (int x, int y) GetSpriteOffset(DecalType decal)
+        {
+            return decal switch
+            {
+                DecalType.Fedora => new (0, 36),
+                _ => new (0, 0)
             };
         }
     }

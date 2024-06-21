@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace BloonFactoryMod.API.Serializables.Behaviors.Actions
 {
-    internal class DamageReductionSerializable : CustomBloonBehaviorSerializable
+    internal class GiveLifeSerializable : CustomBloonBehaviorSerializable
     {
-        public int DamageReduction = 1;
-        public override string Name => "Damage Reduction";
+        public int Life = 1;
+        public override string Name => "Give Life";
     }
 }
