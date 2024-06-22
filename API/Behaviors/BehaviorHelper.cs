@@ -39,10 +39,19 @@ namespace BloonFactoryMod.API.Behaviors
 
             List<CustomBloonBehaviorSerializable> actions = save.BloonBehaviors.Where(a => BehaviorByType[a.GetType()].Type == BehaviorType.Action || BehaviorByType[a.GetType()].Name == "Wait for Seconds Trigger").ToList();
 
+            if (actions.Count == 0)
+            {
+                PopupScreen.instance.SafelyQueue(screen =>
+                {
+                    screen.ShowPopup(PopupScreen.Placement.menuCenter, "No Actions.", "This bloon has no actions attached. Please add an action first.", null, "Continue", null, null, Popup.TransitionAnim.Scale);
+                });
+                return;
+            }
+
             PopupScreen.instance.SafelyQueue(p =>
             {
                 p.ShowPopup(PopupScreen.Placement.menuCenter,
-                    "Add Action", "Choose the action to add.",
+                    "Link Action", "Choose the action to link.",
                     new Action(() => { onComplete.Invoke(actions[dropdown.Dropdown.value]); }), "Confirm", null, "Cancel", Popup.TransitionAnim.Scale, instantClose: true);
 
                 TaskScheduler.ScheduleTask(() =>

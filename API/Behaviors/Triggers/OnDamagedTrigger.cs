@@ -41,7 +41,7 @@ namespace BloonFactoryMod.API.Behaviors.Triggers
                     ((CustomBloonBehaviorTriggerSerializable)serializable).ActionIDs.Add(behavior.GUID);
                     UpdateScrollPanel(scrollpanel, (CustomBloonBehaviorTriggerSerializable)serializable, save);
                 }));
-            })).AddText(new Info("Text", 0, 0, 400, 150), "Add Action");
+            })).AddText(new Info("Text", 0, 0, 400, 150), "Link Action", 60);
 
             panel.AddText(new Info("CooldownText", -237.5f, 50, 400, 150), "Cooldown:", 60, Il2CppTMPro.TextAlignmentOptions.Center);
             var input = panel.AddInputField(new Info("CooldownInput", -237.5f, -75, 250, 100), $"{damage.Cooldown}", VanillaSprites.BlueInsertPanelRound, new Action<string>(value =>

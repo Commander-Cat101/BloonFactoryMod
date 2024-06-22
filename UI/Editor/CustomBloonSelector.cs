@@ -131,7 +131,6 @@ namespace BloonFactoryMod.UI.Editor
                 {
                     tmpInputField.textComponent.font = Fonts.Btd6FontBody;
                     tmpInputField.characterLimit = 20;
-                    tmpInputField.characterValidation = TMP_InputField.CharacterValidation.Alphanumeric;
                 }));
             }))
             .AddText(new Info("Text", 0, 0, 700, 250), "Create", 100);

@@ -117,17 +117,20 @@ namespace BloonFactoryMod.UI.Editor
 
                     var BaseColorPanel = Settings.AddPanel(new Info("BaseColor", -617, 0, 566, 1400), VanillaSprites.MainBGPanelBlue);
                     BaseColorPanel.AddText(new Info("Text", 0, 600, 550, 200), "Base Color").GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
-                    BaseColorPanel.AddSlider(new Info("RSlider", 0, 0, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
+
+                    BaseColorPanel.AddText(new Info("ColorText", 0, -75, 400, 100), "Color", 90);
+
+                    BaseColorPanel.AddSlider(new Info("RSlider", 0, -250, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.R = (byte)value;
                         UpdateVisuals();
                     })).SetCurrentValue(SelectedBloon.R);
-                    BaseColorPanel.AddSlider(new Info("GSlider", 0, -200, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
+                    BaseColorPanel.AddSlider(new Info("GSlider", 0, -400, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.G = (byte)value;
                         UpdateVisuals();
                     })).SetCurrentValue(SelectedBloon.G);
-                    BaseColorPanel.AddSlider(new Info("BSlider", 0, -400, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
+                    BaseColorPanel.AddSlider(new Info("BSlider", 0, -550, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.B = (byte)value;
                         UpdateVisuals();
@@ -144,17 +147,30 @@ namespace BloonFactoryMod.UI.Editor
                         UpdateVisuals();
                     }), VanillaSprites.BlueInsertPanelRound).Dropdown.SetValue(Enum.GetValues<DecalType>().ToList().IndexOf(SelectedBloon.Decal1.Type));
 
-                    BaseDecal1Panel.AddSlider(new Info("RSlider", 0, 0, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
+                    BaseDecal1Panel.AddText(new Info("ColorText", 0, -75, 400, 100), "Color", 90);
+
+                    BaseDecal1Panel.AddSlider(new Info("XSlider", 0, 250, 400, 50), 0, -64, 64, 1, new Vector2(100, 100), new Action<float>(value =>
+                    {
+                        SelectedBloon.Decal1.OffsetX = (int)value;
+                        UpdateVisuals();
+                    })).Slider.value = SelectedBloon.Decal1.OffsetX; 
+                    BaseDecal1Panel.AddSlider(new Info("YSlider", 0, 100, 400, 50), 0, -64, 64, 1, new Vector2(100, 100), new Action<float>(value =>
+                    {
+                        SelectedBloon.Decal1.OffsetY = (int)value;
+                        UpdateVisuals();
+                    })).Slider.value = SelectedBloon.Decal1.OffsetY;
+
+                    BaseDecal1Panel.AddSlider(new Info("RSlider", 0, -250, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal1.R = (int)value;
                         UpdateVisuals();
                     })).SetCurrentValue(SelectedBloon.Decal1.R);
-                    BaseDecal1Panel.AddSlider(new Info("GSlider", 0, -200, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
+                    BaseDecal1Panel.AddSlider(new Info("GSlider", 0, -400, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal1.G = (int)value;
                         UpdateVisuals();
                     })).SetCurrentValue(SelectedBloon.Decal1.G);
-                    BaseDecal1Panel.AddSlider(new Info("BSlider", 0, -400, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
+                    BaseDecal1Panel.AddSlider(new Info("BSlider", 0, -550, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal1.B = (int)value;
                         UpdateVisuals();
@@ -169,17 +185,30 @@ namespace BloonFactoryMod.UI.Editor
                         UpdateVisuals();
                     }), VanillaSprites.BlueInsertPanelRound).Dropdown.SetValue(Enum.GetValues<DecalType>().ToList().IndexOf(SelectedBloon.Decal2.Type));
 
-                    BaseDecal2Panel.AddSlider(new Info("RSlider", 0, 0, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
+                    BaseDecal2Panel.AddText(new Info("ColorText", 0, -75, 400, 100), "Color",90);
+
+                    BaseDecal2Panel.AddSlider(new Info("XSlider", 0, 250, 400, 50), 0, -64, 64, 1, new Vector2(100, 100), new Action<float>(value =>
+                    {
+                        SelectedBloon.Decal2.OffsetX = (int)value;
+                        UpdateVisuals();
+                    })).Slider.value = SelectedBloon.Decal2.OffsetX;
+                    BaseDecal2Panel.AddSlider(new Info("YSlider", 0, 100, 400, 50), 0, -64, 64, 1, new Vector2(100, 100), new Action<float>(value =>
+                    {
+                        SelectedBloon.Decal2.OffsetY = (int)value;
+                        UpdateVisuals();
+                    })).Slider.value = SelectedBloon.Decal2.OffsetY;
+
+                    BaseDecal2Panel.AddSlider(new Info("RSlider", 0, -250, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal2.R = (int)value;
                         UpdateVisuals();
                     })).SetCurrentValue(SelectedBloon.Decal2.R);
-                    BaseDecal2Panel.AddSlider(new Info("GSlider", 0, -200, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
+                    BaseDecal2Panel.AddSlider(new Info("GSlider", 0, -400, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal2.G = (int)value;
                         UpdateVisuals();
                     })).SetCurrentValue(SelectedBloon.Decal2.G);
-                    BaseDecal2Panel.AddSlider(new Info("BSlider", 0, -400, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
+                    BaseDecal2Panel.AddSlider(new Info("BSlider", 0, -550, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal2.B = (int)value;
                         UpdateVisuals();
@@ -192,8 +221,17 @@ namespace BloonFactoryMod.UI.Editor
                     var BaseStatsPanel = Settings.AddPanel(new Info("BaseStats", -617, 0, 566, 1400), VanillaSprites.MainBGPanelBlue);
                     BaseStatsPanel.AddText(new Info("Text", 0, 600, 550, 200), "Base Stats").GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
 
-                    BaseStatsPanel.AddText(new Info("HealthStatText", -75, 200, 350, 200), "Health:", 65, TextAlignmentOptions.MidlineLeft);
-                    healthInput = BaseStatsPanel.AddInputField(new Info("SetHealth", 150, 200, 200, 100), $"{SelectedBloon.Health}", VanillaSprites.BlueInsertPanelRound, new Action<string>(value => { }), 75, TMP_InputField.CharacterValidation.Integer);
+                    BaseStatsPanel.AddText(new Info("Name", 0, 450, 400, 100), "Name", 75, TextAlignmentOptions.Center);
+
+                    var NameInput = BaseStatsPanel.AddInputField(new Info("NameInput", 0, 325, 400, 100), SelectedBloon.Name, VanillaSprites.BlueInsertPanelRound, new Action<string>(value =>
+                    {
+                        SelectedBloon.Name = value;
+                    }), 60);
+                    NameInput.InputField.characterLimit = 20;
+                    NameInput.Text.Text.enableAutoSizing = true;
+
+                    BaseStatsPanel.AddText(new Info("HealthStatText", -75, 100, 350, 200), "Health:", 65, TextAlignmentOptions.MidlineLeft);
+                    healthInput = BaseStatsPanel.AddInputField(new Info("SetHealth", 150, 100, 200, 100), $"{SelectedBloon.Health}", VanillaSprites.BlueInsertPanelRound, new Action<string>(value => { }), 75, TMP_InputField.CharacterValidation.Integer);
                     healthInput.InputField.onValueChanged.AddListener(new Action<string>(value =>
                     {
                         int.TryParse(value, out var intvalue);
@@ -202,8 +240,8 @@ namespace BloonFactoryMod.UI.Editor
                     healthInput.Text.GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
                     healthInput.InputField.characterLimit = 9;
 
-                    BaseStatsPanel.AddText(new Info("SpeedStatText", -75, 50, 350, 200), "Speed:", 65, TextAlignmentOptions.MidlineLeft);
-                    speedInput = BaseStatsPanel.AddInputField(new Info("SetSpeed", 150, 50, 200, 100), $"{SelectedBloon.Speed}", VanillaSprites.BlueInsertPanelRound, new Action<string>(value => { }), 75, TMP_InputField.CharacterValidation.Integer);
+                    BaseStatsPanel.AddText(new Info("SpeedStatText", -75, -50, 350, 200), "Speed:", 65, TextAlignmentOptions.MidlineLeft);
+                    speedInput = BaseStatsPanel.AddInputField(new Info("SetSpeed", 150, -50, 200, 100), $"{SelectedBloon.Speed}", VanillaSprites.BlueInsertPanelRound, new Action<string>(value => { }), 75, TMP_InputField.CharacterValidation.Integer);
                     speedInput.InputField.onValueChanged.AddListener(new Action<string>(value =>
                     {
                         int.TryParse(value, out var intvalue);
@@ -213,8 +251,8 @@ namespace BloonFactoryMod.UI.Editor
                     speedInput.InputField.characterLimit = 9;
                     speedInput.InputField.characterValidation = TMP_InputField.CharacterValidation.Decimal;
 
-                    BaseStatsPanel.AddText(new Info("CashDropStatText", -75, -100, 350, 200), "Cash dropped:", 55, TextAlignmentOptions.MidlineLeft);
-                    cashdropInput = BaseStatsPanel.AddInputField(new Info("SetCashdrop", 150, -100, 200, 100), $"{SelectedBloon.CashDropped}", VanillaSprites.BlueInsertPanelRound, new Action<string>(value => { }), 75, TMP_InputField.CharacterValidation.Integer);
+                    BaseStatsPanel.AddText(new Info("CashDropStatText", -75, -200, 350, 200), "Cash dropped:", 55, TextAlignmentOptions.MidlineLeft);
+                    cashdropInput = BaseStatsPanel.AddInputField(new Info("SetCashdrop", 150, -200, 200, 100), $"{SelectedBloon.CashDropped}", VanillaSprites.BlueInsertPanelRound, new Action<string>(value => { }), 75, TMP_InputField.CharacterValidation.Integer);
                     cashdropInput.InputField.onValueChanged.AddListener(new Action<string>(value =>
                     {
                         int.TryParse(value, out var intvalue);
@@ -224,8 +262,8 @@ namespace BloonFactoryMod.UI.Editor
                     cashdropInput.InputField.characterLimit = 9;
                     cashdropInput.InputField.characterValidation = TMP_InputField.CharacterValidation.Digit;
 
-                    BaseStatsPanel.AddText(new Info("DamageStatText", -75, -250, 350, 200), "Damage:", 55, TextAlignmentOptions.MidlineLeft);
-                    damageInput = BaseStatsPanel.AddInputField(new Info("SetDamage", 150, -250, 200, 100), $"{SelectedBloon.Damage}", VanillaSprites.BlueInsertPanelRound, new Action<string>(value => { }), 75, TMP_InputField.CharacterValidation.Integer);
+                    BaseStatsPanel.AddText(new Info("DamageStatText", -75, -350, 350, 200), "Damage:", 55, TextAlignmentOptions.MidlineLeft);
+                    damageInput = BaseStatsPanel.AddInputField(new Info("SetDamage", 150, -350, 200, 100), $"{SelectedBloon.Damage}", VanillaSprites.BlueInsertPanelRound, new Action<string>(value => { }), 75, TMP_InputField.CharacterValidation.Integer);
                     damageInput.InputField.onValueChanged.AddListener(new Action<string>(value =>
                     {
                         int.TryParse(value, out var intvalue);
@@ -239,23 +277,23 @@ namespace BloonFactoryMod.UI.Editor
                     var BasePropertiesPanel = Settings.AddPanel(new Info("Properties", 0, 0, 566, 1400), VanillaSprites.MainBGPanelBlue);
                     BasePropertiesPanel.AddText(new Info("Text", 0, 600, 550, 200), "Properties").GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
 
-                    BasePropertiesPanel.AddText(new Info("CamoStatText", -50, 350, 400, 200), "Camo", 100, TextAlignmentOptions.MidlineLeft);
-                    BasePropertiesPanel.AddCheckbox(new Info("SetCamo", 175, 350, 90, 90), SelectedBloon.IsCamo, VanillaSprites.BlueInsertPanelRound, new Action<bool>(value => { SelectedBloon.IsCamo = value; }));
+                    BasePropertiesPanel.AddText(new Info("CamoStatText", -50, 250, 400, 200), "Camo", 100, TextAlignmentOptions.MidlineLeft);
+                    BasePropertiesPanel.AddCheckbox(new Info("SetCamo", 175, 250, 90, 90), SelectedBloon.IsCamo, VanillaSprites.BlueInsertPanelRound, new Action<bool>(value => { SelectedBloon.IsCamo = value; }));
 
-                    BasePropertiesPanel.AddText(new Info("LeadStatText", -50, 250, 400, 200), "Lead", 100, TextAlignmentOptions.MidlineLeft);
-                    BasePropertiesPanel.AddCheckbox(new Info("SetLead", 175, 250, 90, 90), SelectedBloon.IsLead, VanillaSprites.BlueInsertPanelRound, new Action<bool>(value => { SelectedBloon.IsLead = value; }));
+                    BasePropertiesPanel.AddText(new Info("LeadStatText", -50, 150, 400, 200), "Lead", 100, TextAlignmentOptions.MidlineLeft);
+                    BasePropertiesPanel.AddCheckbox(new Info("SetLead", 175, 150, 90, 90), SelectedBloon.IsLead, VanillaSprites.BlueInsertPanelRound, new Action<bool>(value => { SelectedBloon.IsLead = value; }));
 
-                    BasePropertiesPanel.AddText(new Info("PurpleStatText", -50, 150, 400, 200), "Purple", 80, TextAlignmentOptions.MidlineLeft);
-                    BasePropertiesPanel.AddCheckbox(new Info("SetPurple", 175, 150, 90, 90), SelectedBloon.IsPurple, VanillaSprites.BlueInsertPanelRound, new Action<bool>(value => { SelectedBloon.IsPurple = value; }));
+                    BasePropertiesPanel.AddText(new Info("PurpleStatText", -50, 50, 400, 200), "Purple", 80, TextAlignmentOptions.MidlineLeft);
+                    BasePropertiesPanel.AddCheckbox(new Info("SetPurple", 175, 50, 90, 90), SelectedBloon.IsPurple, VanillaSprites.BlueInsertPanelRound, new Action<bool>(value => { SelectedBloon.IsPurple = value; }));
 
-                    BasePropertiesPanel.AddText(new Info("WhiteStatText", -50, 50, 400, 200), "White", 100, TextAlignmentOptions.MidlineLeft);
-                    BasePropertiesPanel.AddCheckbox(new Info("SetWhite", 175, 50, 90, 90), SelectedBloon.IsWhite, VanillaSprites.BlueInsertPanelRound, new Action<bool>(value => { SelectedBloon.IsWhite = value; }));
+                    BasePropertiesPanel.AddText(new Info("WhiteStatText", -50, -50, 400, 200), "White", 100, TextAlignmentOptions.MidlineLeft);
+                    BasePropertiesPanel.AddCheckbox(new Info("SetWhite", 175, -50, 90, 90), SelectedBloon.IsWhite, VanillaSprites.BlueInsertPanelRound, new Action<bool>(value => { SelectedBloon.IsWhite = value; }));
 
-                    BasePropertiesPanel.AddText(new Info("BlackStatText", -50, -50, 400, 200), "Black", 100, TextAlignmentOptions.MidlineLeft);
-                    BasePropertiesPanel.AddCheckbox(new Info("SetBlack", 175, -50, 90, 90), SelectedBloon.IsBlack, VanillaSprites.BlueInsertPanelRound, new Action<bool>(value => { SelectedBloon.IsBlack = value; }));
+                    BasePropertiesPanel.AddText(new Info("BlackStatText", -50, -150, 400, 200), "Black", 100, TextAlignmentOptions.MidlineLeft);
+                    BasePropertiesPanel.AddCheckbox(new Info("SetBlack", 175, -150, 90, 90), SelectedBloon.IsBlack, VanillaSprites.BlueInsertPanelRound, new Action<bool>(value => { SelectedBloon.IsBlack = value; }));
 
-                    BasePropertiesPanel.AddText(new Info("FrozenStatText", -50, -150, 400, 200), "Frozen", 100, TextAlignmentOptions.MidlineLeft);
-                    BasePropertiesPanel.AddCheckbox(new Info("SetFrozen", 175, -150, 90, 90), SelectedBloon.IsFrozen, VanillaSprites.BlueInsertPanelRound, new Action<bool>(value => { SelectedBloon.IsFrozen = value; }));
+                    BasePropertiesPanel.AddText(new Info("FrozenStatText", -50, -250, 400, 200), "Frozen", 100, TextAlignmentOptions.MidlineLeft);
+                    BasePropertiesPanel.AddCheckbox(new Info("SetFrozen", 175, -250, 90, 90), SelectedBloon.IsFrozen, VanillaSprites.BlueInsertPanelRound, new Action<bool>(value => { SelectedBloon.IsFrozen = value; }));
 
                     //BasePropertiesPanel.AddText(new Info("RegrowStatText", -50, -250, 400, 200), "Regrow", 100, TextAlignmentOptions.MidlineLeft);
                     //BasePropertiesPanel.AddCheckbox(new Info("SetRegrow", 175, -250, 90, 90), SelectedBloon.IsRegrow, VanillaSprites.BlueInsertPanelRound, new Action<bool>(value => { SelectedBloon.IsRegrow = value; }));

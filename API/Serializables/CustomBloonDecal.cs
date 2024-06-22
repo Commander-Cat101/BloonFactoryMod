@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Il2CppSystem.IO;
+using Newtonsoft.Json;
+using System;
 using System.Text.Json.Serialization;
 using UnityEngine;
 using JsonIgnoreAttribute = Newtonsoft.Json.JsonIgnoreAttribute;
@@ -22,13 +24,17 @@ namespace BloonFactoryMod.API.Serializables
         [JsonInclude]
         public DecalType Type = DecalType.None;
 
+        public int OffsetX = 0;
+
+        public int OffsetY = 0;
+
         public int GetOffsetX()
         {
-            return GetSpriteOffset(Type).x + 64;
+            return Math.Clamp(GetSpriteOffset(Type).x + 64 + OffsetX, 0, 128);
         }
         public int GetOffsetY()
         {
-            return GetSpriteOffset(Type).y + 64;
+            return Math.Clamp(GetSpriteOffset(Type).y + 64 + OffsetY, 0, 128); 
         }
         public enum DecalType
         {

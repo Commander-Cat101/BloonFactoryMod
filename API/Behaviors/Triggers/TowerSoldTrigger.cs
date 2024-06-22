@@ -37,7 +37,7 @@ namespace BloonFactoryMod.API.Behaviors.Triggers
                     ((CustomBloonBehaviorTriggerSerializable)serializable).ActionIDs.Add(behavior.GUID);
                     UpdateScrollPanel(scrollpanel, (CustomBloonBehaviorTriggerSerializable)serializable, save);
                 }));
-            })).AddText(new Info("Text", 0, 0, 400, 150), "Add Action");
+            })).AddText(new Info("Text", 0, 0, 400, 150), "Link Action", 60);
 
             UpdateScrollPanel(scrollpanel, (CustomBloonBehaviorTriggerSerializable)serializable, save);
             return panel;
