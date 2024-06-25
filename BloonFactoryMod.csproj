@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <RootNamespace>BloonFactoryMod</RootNamespace>
@@ -29,16 +29,6 @@
       <None Remove="API\Assets\Decals\IronSwordDecal.png" />
       <None Remove="API\Assets\Decals\IronSwordDecalInGame.png" />
       <None Remove="API\Assets\EmptyTexture0.png" />
-      <None Remove="API\Assets\ScuffedTextureFix\EmptyTexture0.png" />
-      <None Remove="API\Assets\ScuffedTextureFix\EmptyTexture1.png" />
-      <None Remove="API\Assets\ScuffedTextureFix\EmptyTexture2.png" />
-      <None Remove="API\Assets\ScuffedTextureFix\EmptyTexture3.png" />
-      <None Remove="API\Assets\ScuffedTextureFix\EmptyTexture4.png" />
-      <None Remove="API\Assets\ScuffedTextureFix\EmptyTexture5.png" />
-      <None Remove="API\Assets\ScuffedTextureFix\EmptyTexture6.png" />
-      <None Remove="API\Assets\ScuffedTextureFix\EmptyTexture7.png" />
-      <None Remove="API\Assets\ScuffedTextureFix\EmptyTexture8.png" />
-      <None Remove="API\Assets\ScuffedTextureFix\EmptyTexture9.png" />
       <None Remove="Icon.png" />
     </ItemGroup>
     <ItemGroup>
