@@ -115,8 +115,21 @@ namespace BloonFactoryMod.UI.Editor
 
                     Visuals.Button.interactable = false;
 
-                    var BaseColorPanel = Settings.AddPanel(new Info("BaseColor", -617, 0, 566, 1400), VanillaSprites.MainBGPanelBlue);
-                    BaseColorPanel.AddText(new Info("Text", 0, 600, 550, 200), "Base Color").GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+                    var BaseColorPanel = Settings.AddPanel(new Info("Base", -617, 0, 566, 1400), VanillaSprites.MainBGPanelBlue);
+                    BaseColorPanel.AddText(new Info("Text", 0, 600, 550, 200), "Base").GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+
+                    BaseColorPanel.AddButton(new Info("UseCustomButton", 0, 0, 0, 0), VanillaSprites.GreenBtnLong, new Action(() =>
+                    {
+
+                    }));
+
+                    BaseColorPanel.AddText(new Info("SizeText", 0, 250, 400, 100), "Size", 90);
+
+                    BaseColorPanel.AddSlider(new Info("SizeSlider", 0, 75, 400, 50), 1, 0.1f, 2, 0.1f, new Vector2(100, 100), new Action<float>(value =>
+                    {
+                        SelectedBloon.Size = value;
+                        UpdateVisuals();
+                    })).SetCurrentValue(SelectedBloon.Size);
 
                     BaseColorPanel.AddText(new Info("ColorText", 0, -75, 400, 100), "Color", 90);
 

@@ -84,6 +84,8 @@ namespace BloonFactoryMod.API.Serializables
         [JsonInclude]
         public CustomBloonDecal Decal2 = new CustomBloonDecal();
 
+        public float Size = 1f;
+
         public static CustomBloonSave CreateBloonSave(string name)
         {
             var guid = Guid.NewGuid();

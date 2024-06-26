@@ -30,8 +30,10 @@ namespace BloonFactoryMod.API.Bloons
     internal class CustomBloonDisplay : ModDisplay2D
     {
         public const int TextureWidth = 128;
-
         public const int TextureHeight = 128;
+        public const float PixelPerUnit = 10f;
+
+
 
         internal static readonly Dictionary<string, Texture2D> Cache = new();
         public override string Name => bloonSave.Name;
@@ -57,7 +59,7 @@ namespace BloonFactoryMod.API.Bloons
                     value = GenerateTexture();
                 }
 
-                var sprite = Sprite.Create(value, new Rect(0, 0, 256, 256), new Vector2(0.5f, 0.5f), 10f);
+                var sprite = Sprite.Create(value, new Rect(0, 0, TextureWidth * 2, TextureHeight * 2), new Vector2(0.5f, 0.5f), PixelPerUnit / bloonSave.Size);
                 node.GetRenderer<SpriteRenderer>().sprite = sprite;
                 node.IsSprite = true;
             }
@@ -65,7 +67,7 @@ namespace BloonFactoryMod.API.Bloons
             {
                 Texture2D texture = GenerateTexture();
 
-                var sprite = Sprite.Create(texture, new Rect(0, 0, 256, 256), new Vector2(0.5f, 0.5f), 10f);
+                var sprite = Sprite.Create(texture, new Rect(0, 0, TextureWidth * 2, TextureHeight * 2), new Vector2(0.5f, 0.5f), PixelPerUnit / bloonSave.Size);
                 node.GetRenderer<SpriteRenderer>().sprite = sprite;
                 node.IsSprite = true;
             }
@@ -89,23 +91,23 @@ namespace BloonFactoryMod.API.Bloons
                 var decal2Texture = GetSprite<BloonFactoryMod>(CustomBloonDecal.GetSpriteNames(bloonSave.Decal2.Type).Item2);
                 decal2TextureColors = decal2Texture.texture.GetPixels(0, 0, TextureWidth, TextureHeight);
             }
-            Il2CppStructArray<Color> baseSpriteColors = CustomBloonDisplay.sprite.texture.GetPixels(0, 0, TextureWidth, TextureHeight);
+            Il2CppStructArray<Color> baseSpriteColors = sprite.texture.GetPixels(0, 0, TextureWidth, TextureHeight);
 
-            Il2CppStructArray<Color> outputColors = new Il2CppStructArray<Color>(new Color[256 * 256]);
+            Il2CppStructArray<Color> outputColors = new Il2CppStructArray<Color>(new Color[(TextureHeight * 2) * (TextureWidth * 2)]);
 
             for (int i = 0; i < baseSpriteColors.Length; i++)
             {
-                int y = Math.DivRem(i, 128, out int x);
-                outputColors[(x + 64) + (y * 256) + (64 * 256)] = BlendColors(baseSpriteColors[i], bloonSave.Color);
+                int y = Math.DivRem(i, TextureWidth, out int x);
+                outputColors[(x + TextureWidth / 2) + (y * TextureHeight * 2) + (TextureHeight * TextureHeight)] = BlendColors(baseSpriteColors[i], bloonSave.Color);
             }
             if (decal1TextureColors != null)
             {
                 for (int i = 0; i < decal1TextureColors.Length; i++)
                 {
-                    int y = Math.DivRem(i, 128, out int x);
+                    int y = Math.DivRem(i, TextureWidth, out int x);
                     if (decal1TextureColors[i].a > 0.2)
                     {
-                        outputColors[(bloonSave.Decal1.GetOffsetX() + x) + ((y * 256) + (bloonSave.Decal1.GetOffsetY() * 256))] = BlendColors(decal1TextureColors[i], bloonSave.Decal1.Color);
+                        outputColors[bloonSave.Decal1.GetIndex(x, y)] = BlendColors(decal1TextureColors[i], bloonSave.Decal1.Color);
                     }
                 }
             }
@@ -113,16 +115,16 @@ namespace BloonFactoryMod.API.Bloons
             {
                 for (int i = 0; i < decal2TextureColors.Length; i++)
                 {
-                    int y = Math.DivRem(i, 128, out int x);
+                    int y = Math.DivRem(i, TextureWidth, out int x);
                     if (decal2TextureColors[i].a > 0.2)
                     {
-                        outputColors[(bloonSave.Decal2.GetOffsetX() + x) + ((y * 256) + (bloonSave.Decal2.GetOffsetY() * 256))] = BlendColors(decal2TextureColors[i], bloonSave.Decal2.Color);
+                        outputColors[bloonSave.Decal2.GetIndex(x, y)] = BlendColors(decal2TextureColors[i], bloonSave.Decal2.Color);
                     }
                 }
             }
 
-            var texture = new Texture2D(256, 256) { filterMode = FilterMode.Bilinear, mipMapBias = -0.5f };
-            texture.SetPixels(0, 0, 256, 256, outputColors);
+            var texture = new Texture2D(TextureWidth * 2, TextureHeight * 2) { filterMode = FilterMode.Bilinear, mipMapBias = -0.5f };
+            texture.SetPixels(0, 0, TextureWidth * 2, TextureHeight * 2, outputColors);
             texture.Apply(true, false);
 
             Cache[bloonSave.GUID] = texture;

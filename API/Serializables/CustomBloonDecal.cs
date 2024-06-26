@@ -93,5 +93,10 @@ namespace BloonFactoryMod.API.Serializables
                 _ => new (0, 0)
             };
         }
+
+        public int GetIndex(int x, int y)
+        {
+            return GetOffsetX() + x + (y * 256) + GetOffsetY() * 256;
+        }
     }
 }
