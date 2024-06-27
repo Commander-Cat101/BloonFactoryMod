@@ -12,6 +12,8 @@ namespace BloonFactoryMod.API.Serializables
 {
     public class CustomBloonSave
     {
+        public string ModVersion = "1.0.0";
+
         [JsonInclude]
         public string Name = "";
 
@@ -86,13 +88,18 @@ namespace BloonFactoryMod.API.Serializables
 
         public float Size = 1f;
 
+        public bool IsCustomDisplay = false;
+
+        public byte[] CustomDisplay = null;
+
         public static CustomBloonSave CreateBloonSave(string name)
         {
             var guid = Guid.NewGuid();
             var bloon = new CustomBloonSave()
             {
                 GUID = guid.ToString(),
-                Name = name
+                Name = name,
+                ModVersion = ModHelperData.Version
             };
             MelonLogger.Msg($"Created new BloonsSave with the GUID: {bloon.GUID}");
             return bloon;

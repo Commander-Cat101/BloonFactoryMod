@@ -15,6 +15,7 @@ using Il2CppTMPro;
 using MelonLoader;
 using MelonLoader.Utils;
 using NfdSharp;
+using Semver;
 using System;
 using System.IO;
 using UnityEngine;
@@ -88,6 +89,23 @@ namespace BloonFactoryMod.UI.Editor
                     "A restart is required to activate this bloon. " +
                     "Would you like to do that now?", new Action(ProcessHelper.RestartGame),
                     "Yes", null, "No", Popup.TransitionAnim.Scale));
+                }));
+            }
+            else if (SemVersion.Compare(SemVersion.Parse(bloon.ModVersion), SemVersion.Parse(ModHelperData.Version)) < 0)
+            {
+                
+                mainpanel.AddButton(new Info("VersionWarning", 1500, 125, 100, 100), VanillaSprites.NoticeBtn, new System.Action(() =>
+                {
+                    MenuManager.instance.buttonClickSound.Play("ClickSounds");
+
+                    PopupScreen.instance.SafelyQueue(screen => screen.ShowPopup(PopupScreen.Placement.menuCenter,
+                    "Outdated",
+                    "This bloon was made in an older version and may not work as expected.\nThis popup will not show up again.", new Action(() =>
+                    {
+                        bloon.ModVersion = ModHelperData.Version;
+                        LoadBloons();
+                    }),
+                    "Ok", null, null, Popup.TransitionAnim.Scale));
                 }));
             }
 
@@ -172,7 +190,7 @@ namespace BloonFactoryMod.UI.Editor
         public void ImportBloon()
         {
             FileDialogHelper.PrepareNativeDlls();
-            if (Nfd.OpenDialog("", "", out string path) == Nfd.NfdResult.NFD_OKAY)
+            if (Nfd.OpenDialog("bln", "", out string path) == Nfd.NfdResult.NFD_OKAY)
             {
                 var bloon = SaveHandler.LoadBloonFromFile(path);
 

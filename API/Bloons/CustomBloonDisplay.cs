@@ -1,53 +1,45 @@
 ﻿using BloonFactoryMod.API.Serializables;
 using BTD_Mod_Helper;
-using BTD_Mod_Helper.Api;
 using BTD_Mod_Helper.Api.Display;
 using BTD_Mod_Helper.Extensions;
-using Il2CppAssets.Scripts.Models.Bloons;
 using Il2CppAssets.Scripts.Models.GenericBehaviors;
-using Il2CppAssets.Scripts.Models.Towers;
 using Il2CppAssets.Scripts.Unity.Display;
-using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using Il2CppNinjaKiwi.Common.ResourceUtils;
 using MelonLoader;
 using MelonLoader.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Timers;
 using UnityEngine;
-using static Il2CppSystem.Linq.Expressions.Interpreter.CastInstruction.CastInstructionNoT;
-using static UnityEngine.UIElements.UIR.GradientSettingsAtlas;
-using TaskScheduler = BTD_Mod_Helper.Api.TaskScheduler;
 
 namespace BloonFactoryMod.API.Bloons
 {
     internal class CustomBloonDisplay : ModDisplay2D
     {
-        public const int TextureWidth = 128;
-        public const int TextureHeight = 128;
-        public const float PixelPerUnit = 10f;
+        public const int TextureWidth = 500;//128;
+        public const int TextureHeight = 500;//128;
+        public const float PixelPerUnit = 39.0625f;//10f;
 
+        internal static readonly Il2CppSystem.Collections.Generic.Dictionary<string, Texture2D> Cache = new();
+        internal Color[] ColorCache = new Color[TextureWidth * TextureHeight];
 
-
-        internal static readonly Dictionary<string, Texture2D> Cache = new();
         public override string Name => bloonSave.Name;
         public override DisplayCategory DisplayCategory => DisplayCategory.Bloon;
-        protected override string TextureName => "BaseBloonInGame";
+        protected override string TextureName => "BaseBloon";
         public override string BaseDisplay => "9d3c0064c3ace7448bf8fefa4a97a70f";
 
-        public static Sprite sprite = GetSprite<BloonFactoryMod>("BaseBloonInGame");
+        public static Texture2D sprite = GetTexture<BloonFactoryMod>("BaseBloon");
         public CustomBloonSave bloonSave { get; set; }
+
+        public override void Register()
+        {
+            base.Register();
+        }
         public CustomBloonDisplay(CustomBloonSave save)
         {
             mod = ModHelper.GetMod<BloonFactoryMod>();
             bloonSave = save;
-
+            
             Register();
         }
         public override void ModifyDisplayNode(UnityDisplayNode node)
@@ -67,7 +59,7 @@ namespace BloonFactoryMod.API.Bloons
             {
                 Texture2D texture = GenerateTexture();
 
-                var sprite = Sprite.Create(texture, new Rect(0, 0, TextureWidth * 2, TextureHeight * 2), new Vector2(0.5f, 0.5f), PixelPerUnit / bloonSave.Size);
+                var sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), PixelPerUnit / bloonSave.Size);
                 node.GetRenderer<SpriteRenderer>().sprite = sprite;
                 node.IsSprite = true;
             }
@@ -78,22 +70,31 @@ namespace BloonFactoryMod.API.Bloons
             var timer = Stopwatch.StartNew();
             timer.Start();
 
-            Il2CppStructArray<Color> decal1TextureColors = null;
+            if (bloonSave.IsCustomDisplay && bloonSave.CustomDisplay != null)
+            {
+                var customDisplay = new Texture2D(2, 2) { filterMode = FilterMode.Bilinear, mipMapBias = -0.5f };
+                ImageConversion.LoadImage(customDisplay, bloonSave.CustomDisplay);
+                Cache[bloonSave.GUID] = customDisplay;
+                return customDisplay;
+            }
+
+            var baseSpriteColors = sprite.GetPixels();
+
+            Color[] decal1TextureColors = null;
             if (bloonSave.Decal1.Type != CustomBloonDecal.DecalType.None)
             {
-                var decal1Texture = GetSprite<BloonFactoryMod>(CustomBloonDecal.GetSpriteNames(bloonSave.Decal1.Type).Item2);
-                decal1TextureColors = decal1Texture.texture.GetPixels(0, 0, TextureWidth, TextureHeight);
+                var decal1Texture = GetTexture<BloonFactoryMod>(CustomBloonDecal.GetSpriteNames(bloonSave.Decal1.Type));
+                decal1TextureColors = decal1Texture.GetPixels(0, 0, TextureWidth, TextureHeight);
             }
 
-            Il2CppStructArray<Color> decal2TextureColors = null;
+            Color[] decal2TextureColors = null;
             if (bloonSave.Decal2.Type != CustomBloonDecal.DecalType.None)
             {
-                var decal2Texture = GetSprite<BloonFactoryMod>(CustomBloonDecal.GetSpriteNames(bloonSave.Decal2.Type).Item2);
-                decal2TextureColors = decal2Texture.texture.GetPixels(0, 0, TextureWidth, TextureHeight);
+                var decal2Texture = GetTexture<BloonFactoryMod>(CustomBloonDecal.GetSpriteNames(bloonSave.Decal2.Type));
+                decal2TextureColors = decal2Texture.GetPixels(0, 0, TextureWidth, TextureHeight);
             }
-            Il2CppStructArray<Color> baseSpriteColors = sprite.texture.GetPixels(0, 0, TextureWidth, TextureHeight);
 
-            Il2CppStructArray<Color> outputColors = new Il2CppStructArray<Color>(new Color[(TextureHeight * 2) * (TextureWidth * 2)]);
+            Color[] outputColors = new Color[(TextureHeight * 2) * (TextureWidth * 2)];
 
             for (int i = 0; i < baseSpriteColors.Length; i++)
             {
@@ -125,7 +126,7 @@ namespace BloonFactoryMod.API.Bloons
 
             var texture = new Texture2D(TextureWidth * 2, TextureHeight * 2) { filterMode = FilterMode.Bilinear, mipMapBias = -0.5f };
             texture.SetPixels(0, 0, TextureWidth * 2, TextureHeight * 2, outputColors);
-            texture.Apply(true, false);
+            texture.Apply();
 
             Cache[bloonSave.GUID] = texture;
 
