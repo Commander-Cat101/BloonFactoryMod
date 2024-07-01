@@ -1,10 +1,13 @@
 ﻿using BloonFactoryMod.API.Behaviors;
+using BloonFactoryMod.API.Bloons;
 using BloonFactoryMod.API.Serializables;
 using BTD_Mod_Helper.Api;
 using BTD_Mod_Helper.Api.Components;
 using BTD_Mod_Helper.Api.Enums;
+using BTD_Mod_Helper.Api.Helpers;
 using BTD_Mod_Helper.Extensions;
 using Il2Cpp;
+using Il2CppAssets.Scripts.Simulation.Bloons;
 using Il2CppAssets.Scripts.Unity;
 using Il2CppAssets.Scripts.Unity.Menu;
 using Il2CppAssets.Scripts.Unity.UI_New.Popups;
@@ -12,8 +15,12 @@ using Il2CppAssets.Scripts.Unity.UI_New.Settings;
 using Il2CppNinjaKiwi.Common;
 using Il2CppNinjaKiwi.Common.ResourceUtils;
 using Il2CppSystem.Collections.Generic;
+using Il2CppSystem.IO;
 using Il2CppTMPro;
+using MelonLoader;
+using NfdSharp;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,10 +31,11 @@ namespace BloonFactoryMod.UI.Editor
 {
     internal class BloonEditor : ModGameMenu<SettingsScreen>
     {
-        internal SpriteReference Bloon = ModContent.GetSpriteReference<BloonFactoryMod>("BaseBloon");
+        internal SpriteReference Bloon = GetSpriteReference<BloonFactoryMod>("BaseBloon");
 
-        public const float OffsetPerPixel = 8f;
+        public const float OffsetPerPixel = 3f;
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         ModHelperButton Visuals;
         ModHelperButton Stats;
         ModHelperButton Behaviors;
@@ -48,7 +56,9 @@ namespace BloonFactoryMod.UI.Editor
 
         public ModHelperImage Bloonimage;
         public ModHelperImage Decal1;
-        public ModHelperImage Decal2;
+        public ModHelperImage Decal2;   
+
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public override bool OnMenuOpened(Il2CppSystem.Object data)
         {
@@ -115,8 +125,22 @@ namespace BloonFactoryMod.UI.Editor
 
                     Visuals.Button.interactable = false;
 
-                    var BaseColorPanel = Settings.AddPanel(new Info("BaseColor", -617, 0, 566, 1400), VanillaSprites.MainBGPanelBlue);
-                    BaseColorPanel.AddText(new Info("Text", 0, 600, 550, 200), "Base Color").GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+                    var BaseColorPanel = Settings.AddPanel(new Info("Base", -617, 0, 566, 1400), VanillaSprites.MainBGPanelBlue);
+                    BaseColorPanel.AddText(new Info("Text", 0, 600, 550, 200), "Base", 90);
+
+                    var button = BaseColorPanel.AddButton(new Info("UseCustomButton", 0, 450, 450, 150), SelectedBloon.IsCustomDisplay ? VanillaSprites.RedBtnLong : VanillaSprites.GreenBtnLong, new Action(() =>
+                    {
+                        UseCustomDisplayPopup();
+                    }));
+                    button.AddText(new Info("UseCustom", 0, 0, 400, 100), SelectedBloon.IsCustomDisplay ? "Using Custom" : "Use Custom", 60).Text.enableAutoSizing = true;
+
+                    BaseColorPanel.AddText(new Info("SizeText", 0, 250, 400, 100), "Size", 90);
+
+                    BaseColorPanel.AddSlider(new Info("SizeSlider", 0, 75, 400, 50), 1, 0.1f, 2, 0.1f, new Vector2(100, 100), new Action<float>(value =>
+                    {
+                        SelectedBloon.Size = value;
+                        UpdateVisuals();
+                    }), 42, "", SelectedBloon.Size);
 
                     BaseColorPanel.AddText(new Info("ColorText", 0, -75, 400, 100), "Color", 90);
 
@@ -124,20 +148,20 @@ namespace BloonFactoryMod.UI.Editor
                     {
                         SelectedBloon.R = (byte)value;
                         UpdateVisuals();
-                    })).SetCurrentValue(SelectedBloon.R);
+                    }), 42, "", SelectedBloon.R).SetSelectable(SelectedBloon);
                     BaseColorPanel.AddSlider(new Info("GSlider", 0, -400, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.G = (byte)value;
                         UpdateVisuals();
-                    })).SetCurrentValue(SelectedBloon.G);
+                    }), 42, "", SelectedBloon.G).SetSelectable(SelectedBloon);
                     BaseColorPanel.AddSlider(new Info("BSlider", 0, -550, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.B = (byte)value;
                         UpdateVisuals();
-                    })).SetCurrentValue(SelectedBloon.B);
+                    }), 42, "", SelectedBloon.B).SetSelectable(SelectedBloon);
 
                     var BaseDecal1Panel = Settings.AddPanel(new Info("Decal1Panel", 0, 0, 566, 1400), VanillaSprites.MainBGPanelBlue);
-                    BaseDecal1Panel.AddText(new Info("Text", 0, 600, 550, 200), "Decal 1").GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+                    BaseDecal1Panel.AddText(new Info("Text", 0, 600, 550, 200), "Decal 1", 90);
 
                     List<string> decalOptions = Enum.GetNames<DecalType>().ToIl2CppList();
 
@@ -153,31 +177,31 @@ namespace BloonFactoryMod.UI.Editor
                     {
                         SelectedBloon.Decal1.OffsetX = (int)value;
                         UpdateVisuals();
-                    })).Slider.value = SelectedBloon.Decal1.OffsetX; 
+                    }), 42, "", SelectedBloon.Decal1.OffsetX).SetSelectable(SelectedBloon);
                     BaseDecal1Panel.AddSlider(new Info("YSlider", 0, 100, 400, 50), 0, -64, 64, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal1.OffsetY = (int)value;
                         UpdateVisuals();
-                    })).Slider.value = SelectedBloon.Decal1.OffsetY;
+                    }), 42, "", SelectedBloon.Decal1.OffsetY).SetSelectable(SelectedBloon);
 
                     BaseDecal1Panel.AddSlider(new Info("RSlider", 0, -250, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal1.R = (int)value;
                         UpdateVisuals();
-                    })).SetCurrentValue(SelectedBloon.Decal1.R);
+                    }), 42, "", SelectedBloon.Decal1.R).SetSelectable(SelectedBloon);
                     BaseDecal1Panel.AddSlider(new Info("GSlider", 0, -400, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal1.G = (int)value;
                         UpdateVisuals();
-                    })).SetCurrentValue(SelectedBloon.Decal1.G);
+                    }), 42, "", SelectedBloon.Decal1.G).SetSelectable(SelectedBloon);
                     BaseDecal1Panel.AddSlider(new Info("BSlider", 0, -550, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal1.B = (int)value;
                         UpdateVisuals();
-                    })).SetCurrentValue(SelectedBloon.Decal1.B);
+                    }), 42, "", SelectedBloon.Decal1.B).SetSelectable(SelectedBloon);
 
                     var BaseDecal2Panel = Settings.AddPanel(new Info("Decal2Panel", 617, 0, 566, 1400), VanillaSprites.MainBGPanelBlue);
-                    BaseDecal2Panel.AddText(new Info("Text", 0, 600, 550, 200), "Decal 2").GetComponent<NK_TextMeshProUGUI>().enableAutoSizing = true;
+                    BaseDecal2Panel.AddText(new Info("Text", 0, 600, 550, 200), "Decal 2", 90);
 
                     BaseDecal2Panel.AddDropdown(new Info("DecalDropdown", 0, 450, 400, 100), decalOptions, 400, new Action<int>(choice =>
                     {
@@ -185,34 +209,34 @@ namespace BloonFactoryMod.UI.Editor
                         UpdateVisuals();
                     }), VanillaSprites.BlueInsertPanelRound).Dropdown.SetValue(Enum.GetValues<DecalType>().ToList().IndexOf(SelectedBloon.Decal2.Type));
 
-                    BaseDecal2Panel.AddText(new Info("ColorText", 0, -75, 400, 100), "Color",90);
+                    BaseDecal2Panel.AddText(new Info("ColorText", 0, -75, 400, 100), "Color", 90);
 
                     BaseDecal2Panel.AddSlider(new Info("XSlider", 0, 250, 400, 50), 0, -64, 64, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal2.OffsetX = (int)value;
                         UpdateVisuals();
-                    })).Slider.value = SelectedBloon.Decal2.OffsetX;
+                    }), 42, "", SelectedBloon.Decal2.OffsetX).SetSelectable(SelectedBloon);
                     BaseDecal2Panel.AddSlider(new Info("YSlider", 0, 100, 400, 50), 0, -64, 64, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal2.OffsetY = (int)value;
                         UpdateVisuals();
-                    })).Slider.value = SelectedBloon.Decal2.OffsetY;
+                    }), 42, "", SelectedBloon.Decal2.OffsetY).SetSelectable(SelectedBloon);
 
                     BaseDecal2Panel.AddSlider(new Info("RSlider", 0, -250, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal2.R = (int)value;
                         UpdateVisuals();
-                    })).SetCurrentValue(SelectedBloon.Decal2.R);
+                    }), 42, "", SelectedBloon.Decal2.R).SetSelectable(SelectedBloon);
                     BaseDecal2Panel.AddSlider(new Info("GSlider", 0, -400, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal2.G = (int)value;
                         UpdateVisuals();
-                    })).SetCurrentValue(SelectedBloon.Decal2.G);
+                    }), 42, "", SelectedBloon.Decal2.G).SetSelectable(SelectedBloon);
                     BaseDecal2Panel.AddSlider(new Info("BSlider", 0, -550, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal2.B = (int)value;
                         UpdateVisuals();
-                    })).SetCurrentValue(SelectedBloon.Decal2.B);
+                    }), 42, "", SelectedBloon.Decal2.B).SetSelectable(SelectedBloon);
                     break;
                 case EditorPanel.Stats:
                     Stats.Button.interactable = false;
@@ -388,12 +412,22 @@ namespace BloonFactoryMod.UI.Editor
 
         public void UpdateVisuals()
         {
+            if (SelectedBloon.IsCustomDisplay && SelectedBloon.CustomDisplay != null)
+            {
+                var customDisplay = new Texture2D(2, 2) { filterMode = FilterMode.Bilinear, mipMapBias = -0.5f };
+                ImageConversion.LoadImage(customDisplay, SelectedBloon.CustomDisplay);
+                Bloonimage.Image.SetSprite(Sprite.Create(customDisplay, new Rect(0, 0, customDisplay.width, customDisplay.height), new Vector2(0.5f, 0.5f), 39f));
+                Decal1.SetActive(false);
+                Decal2.SetActive(false);
+                return;
+            }
+
             Bloonimage.Image.color = SelectedBloon.Color;
             if (SelectedBloon.Decal1.Type != DecalType.None)
             {
                 Decal1.SetActive(true);
                 var names = GetSpriteNames(SelectedBloon.Decal1.Type);
-                Decal1.Image.SetSprite(GetSprite<BloonFactoryMod>(names.Item1));
+                Decal1.Image.SetSprite(GetSprite<BloonFactoryMod>(names));
             }
             else
             {
@@ -404,15 +438,15 @@ namespace BloonFactoryMod.UI.Editor
             {
                 Decal2.SetActive(true);
                 var names = GetSpriteNames(SelectedBloon.Decal2.Type);
-                Decal2.Image.SetSprite(GetSprite<BloonFactoryMod>(names.Item1));
+                Decal2.Image.SetSprite(GetSprite<BloonFactoryMod>(names));
             }
             else
             {
                 Decal2.SetActive(false);
             }
 
-            Decal1.transform.localPosition = new Vector3(OffsetPerPixel * (SelectedBloon.Decal1.GetOffsetX() - 64), OffsetPerPixel * (SelectedBloon.Decal1.GetOffsetY() - 64), 0);
-            Decal2.transform.localPosition = new Vector3(OffsetPerPixel * (SelectedBloon.Decal2.GetOffsetX() - 64), OffsetPerPixel * (SelectedBloon.Decal2.GetOffsetY() - 64), 0);
+            Decal1.transform.localPosition = new Vector3(OffsetPerPixel * (SelectedBloon.Decal1.GetOffsetX() - CustomBloonDisplay.TextureWidth / 2), OffsetPerPixel * (SelectedBloon.Decal1.GetOffsetY() - CustomBloonDisplay.TextureHeight / 2));
+            Decal2.transform.localPosition = new Vector3(OffsetPerPixel * (SelectedBloon.Decal2.GetOffsetX() - CustomBloonDisplay.TextureWidth / 2), OffsetPerPixel * (SelectedBloon.Decal2.GetOffsetY() - CustomBloonDisplay.TextureHeight / 2));
 
             Decal1.Image.color = SelectedBloon.Decal1.Color;
             Decal2.Image.color = SelectedBloon.Decal2.Color;
@@ -511,6 +545,36 @@ namespace BloonFactoryMod.UI.Editor
                 BehaviorsPanel.AddScrollContent(panel);
             }
 
+        }
+        public void UseCustomDisplayPopup()
+        {
+            if (!SelectedBloon.IsCustomDisplay)
+            {
+                PopupScreen.instance.SafelyQueue(screen => screen.ShowPopup(PopupScreen.Placement.menuCenter,
+                "Use Custom Display", "Custom Display is a advanced feature.\nCustom Displays disable your existing display.\nThis allows you to use a custom image.\nImages should be 500x500.", new Action(() =>
+                {
+                    if (Nfd.OpenDialog("png,jpg", "", out string path) == Nfd.NfdResult.NFD_OKAY)
+                    {
+                        byte[] bytes = File.ReadAllBytes(path);
+                        SelectedBloon.CustomDisplay = bytes;
+                        SelectedBloon.IsCustomDisplay = true;
+                        UpdateVisuals();
+                        SelectEditorPanel(EditorPanel.Visuals);
+                    }
+                }), "Continue", null, "Back", Popup.TransitionAnim.Scale));
+            }
+            else
+            {
+                PopupScreen.instance.SafelyQueue(screen => screen.ShowPopup(PopupScreen.Placement.menuCenter,
+                "Remove Custom Display", "Do you want to remove this custom display?", new Action(() =>
+                {
+                    SelectedBloon.CustomDisplay = null;
+                    SelectedBloon.IsCustomDisplay = false;
+                    UpdateVisuals();
+                    Bloonimage.Image.SetSprite(Bloon);
+                    SelectEditorPanel(EditorPanel.Visuals);
+                }), "Continue", null, "Back", Popup.TransitionAnim.Scale));
+            }                      
         }
         public ModHelperPanel CreateRoundPanel(CustomBloonRound round)
         {

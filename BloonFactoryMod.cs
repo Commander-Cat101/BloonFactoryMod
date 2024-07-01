@@ -11,6 +11,8 @@ using BTD_Mod_Helper.Extensions;
 using System.Reflection;
 using BloonFactoryMod.API;
 using Il2CppAssets.Scripts.Unity.UI_New.InGame;
+using Il2CppAssets.Scripts.Models.Bloons;
+using Il2CppAssets.Scripts.Models.Bloons.Behaviors.Triggers;
 
 [assembly: MelonInfo(typeof(BloonFactoryMod.BloonFactoryMod), ModHelperData.Name, ModHelperData.Version, ModHelperData.RepoOwner)]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
@@ -21,6 +23,7 @@ public class BloonFactoryMod : BloonsTD6Mod
 {
     public override void OnApplicationStart()
     {
+        ResourceHandler.LoadBundle();
         ModHelper.Msg<BloonFactoryMod>("BloonFactoryMod loaded!");
     }
     public override void OnApplicationQuit()

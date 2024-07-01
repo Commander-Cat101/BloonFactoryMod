@@ -1,6 +1,8 @@
-﻿using Il2CppSystem.IO;
+﻿using BloonFactoryMod.API.Bloons;
+using Il2CppSystem.IO;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using UnityEngine;
 using JsonIgnoreAttribute = Newtonsoft.Json.JsonIgnoreAttribute;
@@ -30,12 +32,12 @@ namespace BloonFactoryMod.API.Serializables
 
         public int GetOffsetX()
         {
-            return Math.Clamp(GetSpriteOffset(Type).x + 64 + OffsetX, 0, 128);
+            return Math.Clamp(GetSpriteOffset(Type).x + CustomBloonDisplay.TextureWidth / 2 + OffsetX, 0, CustomBloonDisplay.TextureWidth);
         }
         public int GetOffsetY()
         {
-            return Math.Clamp(GetSpriteOffset(Type).y + 64 + OffsetY, 0, 128); 
-        }
+            return Math.Clamp(GetSpriteOffset(Type).y + CustomBloonDisplay.TextureHeight / 2 + OffsetY, 0, CustomBloonDisplay.TextureHeight); 
+        }  
         public enum DecalType
         {
             None,
@@ -69,29 +71,34 @@ namespace BloonFactoryMod.API.Serializables
         /// </summary>
         /// <param name="decal"></param>
         /// <returns></returns>
-        public static (string, string) GetSpriteNames(DecalType decal)
+        public static string GetSpriteNames(DecalType decal)
         {
             return decal switch
             {
-                DecalType.None => (string.Empty, string.Empty),
-                DecalType.HalfHorizontalBloon => ("HalfHorizontalBloonDecal", "HalfHorizontalBloonDecalInGame"),
-                DecalType.HalfVerticalBloon => ("HalfVerticalBloonDecal", "HalfVerticalBloonDecalInGame"),
-                DecalType.Bowtie => ("BowtieDecal", "BowtieDecalInGame"),
-                DecalType.Face1 => ("Face1Decal", "Face1DecalInGame"),
-                DecalType.Sword => ("IronSwordDecal", "IronSwordDecalInGame"),
-                DecalType.Fedora => ("FedoraDecal", "FedoraDecalInGame"),
-                DecalType.Disguise => ("DisguiseDecal", "DisguiseDecalInGame"),
-                DecalType.Camo => ("CamoDecal", "CamoDecalInGame")
+                DecalType.None => string.Empty,
+                DecalType.HalfHorizontalBloon => "HalfHorizontalBloonDecal",
+                DecalType.HalfVerticalBloon => "HalfVerticalBloonDecal",
+                DecalType.Bowtie => "BowtieDecal",
+                DecalType.Face1 => "Face1Decal",
+                DecalType.Sword => "IronSwordDecal",
+                DecalType.Fedora => "FedoraDecal",
+                DecalType.Disguise => "DisguiseDecal",
+                DecalType.Camo => "CamoDecal"
             };
         }
-
+            
         public static (int x, int y) GetSpriteOffset(DecalType decal)
         {
             return decal switch
             {
-                DecalType.Fedora => new (0, 36),
+                DecalType.Fedora => new (0, (int)(CustomBloonDisplay.TextureHeight / 4f)),
                 _ => new (0, 0)
             };
+        }
+
+        public int GetIndex(int x, int y)
+        {
+            return GetOffsetX() + x + (y * CustomBloonDisplay.TextureHeight * 2) + GetOffsetY() * CustomBloonDisplay.TextureHeight * 2;
         }
     }
 }

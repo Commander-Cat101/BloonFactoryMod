@@ -11,23 +11,14 @@
     </PropertyGroup>
     <ItemGroup>
       <None Remove="API\Assets\BaseBloon.png" />
-      <None Remove="API\Assets\BaseBloonInGame.png" />
       <None Remove="API\Assets\Decals\BowtieDecal.png" />
-      <None Remove="API\Assets\Decals\BowtieDecalInGame.png" />
       <None Remove="API\Assets\Decals\CamoDecal.png" />
-      <None Remove="API\Assets\Decals\CamoDecalInGame.png" />
       <None Remove="API\Assets\Decals\DisguiseDecal.png" />
-      <None Remove="API\Assets\Decals\DisguiseDecalInGame.png" />
       <None Remove="API\Assets\Decals\Face1Decal.png" />
-      <None Remove="API\Assets\Decals\Face1DecalInGame.png" />
       <None Remove="API\Assets\Decals\FedoraDecal.png" />
-      <None Remove="API\Assets\Decals\FedoraDecalInGame.png" />
       <None Remove="API\Assets\Decals\HalfHorizontalBloonDecal.png" />
-      <None Remove="API\Assets\Decals\HalfHorizontalBloonDecalInGame.png" />
       <None Remove="API\Assets\Decals\HalfVerticalBloonDecal.png" />
-      <None Remove="API\Assets\Decals\HalfVerticalBloonDecalInGame.png" />
       <None Remove="API\Assets\Decals\IronSwordDecal.png" />
-      <None Remove="API\Assets\Decals\IronSwordDecalInGame.png" />
       <None Remove="API\Assets\EmptyTexture0.png" />
       <None Remove="Icon.png" />
     </ItemGroup>
