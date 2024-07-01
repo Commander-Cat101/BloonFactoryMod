@@ -57,7 +57,7 @@ namespace BloonFactoryMod.UI.Editor
         public void CreateMainPanel(ModHelperPanel menu)
         {
             var scrollpaneloutline = menu.AddPanel(new Info("ScrollPanelOutline", 0, 200, 3200, 1800), VanillaSprites.MainBGPanelBlue);
-            scrollPanel = scrollpaneloutline.AddScrollPanel(new Info("ScrollPanel", 0, 0, 3100, 1700), RectTransform.Axis.Vertical, VanillaSprites.BlueInsertPanelRound, -150, -200);
+            scrollPanel = scrollpaneloutline.AddScrollPanel(new Info("ScrollPanel", 0, 0, 3100, 1700), RectTransform.Axis.Vertical, VanillaSprites.BlueInsertPanelRound, -150, -0);
             LoadBloons();
         }
         public void LoadBloons()

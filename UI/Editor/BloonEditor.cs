@@ -20,12 +20,12 @@ using Il2CppTMPro;
 using MelonLoader;
 using NfdSharp;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using static BloonFactoryMod.API.Behaviors.CustomBloonBehavior;
 using static BloonFactoryMod.API.Serializables.CustomBloonDecal;
-using static Il2CppSystem.Linq.Expressions.Interpreter.CastInstruction.CastInstructionNoT;
 
 namespace BloonFactoryMod.UI.Editor
 {
@@ -35,6 +35,7 @@ namespace BloonFactoryMod.UI.Editor
 
         public const float OffsetPerPixel = 3f;
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         ModHelperButton Visuals;
         ModHelperButton Stats;
         ModHelperButton Behaviors;
@@ -55,7 +56,9 @@ namespace BloonFactoryMod.UI.Editor
 
         public ModHelperImage Bloonimage;
         public ModHelperImage Decal1;
-        public ModHelperImage Decal2;
+        public ModHelperImage Decal2;   
+
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public override bool OnMenuOpened(Il2CppSystem.Object data)
         {
@@ -137,7 +140,7 @@ namespace BloonFactoryMod.UI.Editor
                     {
                         SelectedBloon.Size = value;
                         UpdateVisuals();
-                    })).SetCurrentValue(SelectedBloon.Size);
+                    }), 42, "", SelectedBloon.Size);
 
                     BaseColorPanel.AddText(new Info("ColorText", 0, -75, 400, 100), "Color", 90);
 
@@ -145,17 +148,17 @@ namespace BloonFactoryMod.UI.Editor
                     {
                         SelectedBloon.R = (byte)value;
                         UpdateVisuals();
-                    })).SetCurrentValue(SelectedBloon.R);
+                    }), 42, "", SelectedBloon.R).SetSelectable(SelectedBloon);
                     BaseColorPanel.AddSlider(new Info("GSlider", 0, -400, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.G = (byte)value;
                         UpdateVisuals();
-                    })).SetCurrentValue(SelectedBloon.G);
+                    }), 42, "", SelectedBloon.G).SetSelectable(SelectedBloon);
                     BaseColorPanel.AddSlider(new Info("BSlider", 0, -550, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.B = (byte)value;
                         UpdateVisuals();
-                    })).SetCurrentValue(SelectedBloon.B);
+                    }), 42, "", SelectedBloon.B).SetSelectable(SelectedBloon);
 
                     var BaseDecal1Panel = Settings.AddPanel(new Info("Decal1Panel", 0, 0, 566, 1400), VanillaSprites.MainBGPanelBlue);
                     BaseDecal1Panel.AddText(new Info("Text", 0, 600, 550, 200), "Decal 1", 90);
@@ -174,28 +177,28 @@ namespace BloonFactoryMod.UI.Editor
                     {
                         SelectedBloon.Decal1.OffsetX = (int)value;
                         UpdateVisuals();
-                    })).Slider.value = SelectedBloon.Decal1.OffsetX; 
+                    }), 42, "", SelectedBloon.Decal1.OffsetX).SetSelectable(SelectedBloon);
                     BaseDecal1Panel.AddSlider(new Info("YSlider", 0, 100, 400, 50), 0, -64, 64, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal1.OffsetY = (int)value;
                         UpdateVisuals();
-                    })).Slider.value = SelectedBloon.Decal1.OffsetY;
+                    }), 42, "", SelectedBloon.Decal1.OffsetY).SetSelectable(SelectedBloon);
 
                     BaseDecal1Panel.AddSlider(new Info("RSlider", 0, -250, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal1.R = (int)value;
                         UpdateVisuals();
-                    })).SetCurrentValue(SelectedBloon.Decal1.R);
+                    }), 42, "", SelectedBloon.Decal1.R).SetSelectable(SelectedBloon);
                     BaseDecal1Panel.AddSlider(new Info("GSlider", 0, -400, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal1.G = (int)value;
                         UpdateVisuals();
-                    })).SetCurrentValue(SelectedBloon.Decal1.G);
+                    }), 42, "", SelectedBloon.Decal1.G).SetSelectable(SelectedBloon);
                     BaseDecal1Panel.AddSlider(new Info("BSlider", 0, -550, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal1.B = (int)value;
                         UpdateVisuals();
-                    })).SetCurrentValue(SelectedBloon.Decal1.B);
+                    }), 42, "", SelectedBloon.Decal1.B).SetSelectable(SelectedBloon);
 
                     var BaseDecal2Panel = Settings.AddPanel(new Info("Decal2Panel", 617, 0, 566, 1400), VanillaSprites.MainBGPanelBlue);
                     BaseDecal2Panel.AddText(new Info("Text", 0, 600, 550, 200), "Decal 2", 90);
@@ -206,34 +209,34 @@ namespace BloonFactoryMod.UI.Editor
                         UpdateVisuals();
                     }), VanillaSprites.BlueInsertPanelRound).Dropdown.SetValue(Enum.GetValues<DecalType>().ToList().IndexOf(SelectedBloon.Decal2.Type));
 
-                    BaseDecal2Panel.AddText(new Info("ColorText", 0, -75, 400, 100), "Color",90);
+                    BaseDecal2Panel.AddText(new Info("ColorText", 0, -75, 400, 100), "Color", 90);
 
                     BaseDecal2Panel.AddSlider(new Info("XSlider", 0, 250, 400, 50), 0, -64, 64, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal2.OffsetX = (int)value;
                         UpdateVisuals();
-                    })).Slider.value = SelectedBloon.Decal2.OffsetX;
+                    }), 42, "", SelectedBloon.Decal2.OffsetX).SetSelectable(SelectedBloon);
                     BaseDecal2Panel.AddSlider(new Info("YSlider", 0, 100, 400, 50), 0, -64, 64, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal2.OffsetY = (int)value;
                         UpdateVisuals();
-                    })).Slider.value = SelectedBloon.Decal2.OffsetY;
+                    }), 42, "", SelectedBloon.Decal2.OffsetY).SetSelectable(SelectedBloon);
 
                     BaseDecal2Panel.AddSlider(new Info("RSlider", 0, -250, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal2.R = (int)value;
                         UpdateVisuals();
-                    })).SetCurrentValue(SelectedBloon.Decal2.R);
+                    }), 42, "", SelectedBloon.Decal2.R).SetSelectable(SelectedBloon);
                     BaseDecal2Panel.AddSlider(new Info("GSlider", 0, -400, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal2.G = (int)value;
                         UpdateVisuals();
-                    })).SetCurrentValue(SelectedBloon.Decal2.G);
+                    }), 42, "", SelectedBloon.Decal2.G).SetSelectable(SelectedBloon);
                     BaseDecal2Panel.AddSlider(new Info("BSlider", 0, -550, 400, 50), 0, 0, 255, 1, new Vector2(100, 100), new Action<float>(value =>
                     {
                         SelectedBloon.Decal2.B = (int)value;
                         UpdateVisuals();
-                    })).SetCurrentValue(SelectedBloon.Decal2.B);
+                    }), 42, "", SelectedBloon.Decal2.B).SetSelectable(SelectedBloon);
                     break;
                 case EditorPanel.Stats:
                     Stats.Button.interactable = false;
