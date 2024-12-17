@@ -2,8 +2,8 @@ namespace BloonFactoryMod;
 
 public static class ModHelperData
 {
-    public const string WorksOnVersion = "42.0";
-    public const string Version = "1.1.0";
+    public const string WorksOnVersion = "45.0";
+    public const string Version = "1.1.1";
     public const string Name = "BloonFactoryMod";
 
     public const string Description = "Create your own bloons! Thanks to Manny for creating most of the beautiful decals!";

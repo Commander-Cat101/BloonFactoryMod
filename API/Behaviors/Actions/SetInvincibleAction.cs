@@ -10,7 +10,6 @@ using Il2CppAssets.Scripts.Models.Bloons.Behaviors;
 using Il2CppAssets.Scripts.Unity;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppNinjaKiwi.Common.ResourceUtils;
-using Il2CppNinjaKiwi.LiNK.AuthenticationProviders;
 using Il2CppSystem.Collections.Generic;
 using System;
 using System.Collections.Generic;
@@ -26,7 +25,7 @@ namespace BloonFactoryMod.API.Behaviors.Actions
         public override void AddToBloon(BloonModel bloon, CustomBloonBehaviorSerializable serializable)
         {
             var invincible = (SetInvincibleActionSerializable)serializable;
-            bloon.AddBehavior(new SetInvulnerableActionModel($"SetInvulnerable:{serializable.GUID}", serializable.GUID, invincible.IsInvincible, new AudioSourceReference { guidRef =  ""}));
+            bloon.AddBehavior(new SetInvulnerableActionModel($"SetInvulnerable:{serializable.GUID}", serializable.GUID, invincible.IsInvincible, new AudioClipReference { guidRef =  ""}));
         }
 
         public override ModHelperPanel CreatePanel(CustomBloonBehaviorSerializable serializable, CustomBloonSave save)
